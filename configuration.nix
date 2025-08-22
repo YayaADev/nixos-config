@@ -9,7 +9,6 @@
     ./modules/system/basics.nix
     ./modules/users/nixos.nix
     ./modules/system/networking.nix
-    
     # Services
     ./modules/services/nginx.nix
     ./modules/services/adguard.nix
@@ -21,7 +20,7 @@
     ./modules/programs/vscode.nix
     ./modules/programs/zsh.nix
     ./modules/programs/ssh.nix
-
+    ./modules/programs/tailscale.nix
   ];
 
   system.stateVersion = "25.05";
