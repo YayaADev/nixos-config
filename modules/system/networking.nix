@@ -1,7 +1,6 @@
-# modules/system/networking.nix (or wherever this file is)
 { config, lib, pkgs, ... }:
 let
-  constants = import ../constants.nix;  # Adjust path as needed
+  constants = import ../constants.nix;
 in
 {
   networking = {
@@ -18,9 +17,9 @@ in
     # Gateway and DNS with fallbacks
     defaultGateway = constants.network.gateway;
     nameservers = [
-      "1.1.1.1" # Always works
-      "8.8.8.8" # Always works
-      constants.network.gateway # Works when on home network
+       "9.9.9.9"
+       "1.1.1.1" 
+      constants.network.staticIP
     ];
   };
   

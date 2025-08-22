@@ -1,5 +1,28 @@
 let
   secrets = import ../secrets.nix;
+  lib = import <nixpkgs/lib>;
+  
+  # Define services (removed SSH as requested)
+  services = {
+    # Core system services
+    adguard = { 
+      port = 3000; 
+      hostname = "adguard.home"; 
+      description = "AdGuard Home DNS"; 
+    };
+    nginx = { 
+      port = 80; 
+      description = "Nginx Web Server"; 
+    };
+
+    # Obsidian Notes Sync
+    webdav = {
+      port = 5005;
+      hostname = "webdav.home";
+      description = "WebDAV File Sync";
+    };
+  };
+  
 in
 {
   network = {
@@ -9,15 +32,15 @@ in
     subnet = secrets.subnet;
   };
   
-  # Service ports
-  ports = {
-    adguard = 3000;
-    dns = 53;
-    ssh = 22;
-  };
+  # Services configuration
+  services = services;
   
-  # Hostnames
-  hostnames = {
-    adguard = "adguard.home";
-  };
+  # Helper functions to extract data
+  ports = lib.mapAttrs (name: service: service.port) services;
+  
+  # Services that have hostnames (for nginx virtual hosts)
+  nginxServices = lib.filterAttrs (name: service: service ? hostname) services;
+  
+  # All TCP ports that need to be opened in firewall
+  allTcpPorts = lib.attrValues (lib.mapAttrs (name: service: service.port) services);
 }

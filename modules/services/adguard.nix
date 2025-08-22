@@ -1,23 +1,22 @@
-# modules/services/adguard.nix
+# Adguard wiki https://wiki.nixos.org/wiki/Adguard_Home
 { config, lib, pkgs, ... }:
 let
-  constants = import ../constants.nix;  # Adjust path as needed
+  constants = import ../constants.nix;
 in
 {
   services.adguardhome = {
     enable = true;
-    mutableSettings = false;  # Set to false to force NixOS config
+    mutableSettings = false;
     settings = {
       # Web interface
       http = {
-        address = "0.0.0.0:${toString constants.ports.adguard}";
+        address = "0.0.0.0:${toString constants.services.adguard.port}";
       };
       
       # DNS configuration
       dns = {
         bind_hosts = [ "0.0.0.0" ];
-        port = constants.ports.dns;
-        # Upstream DNS servers
+        port = 53;  # Standard DNS port - hardcoded since it's not a separate service
         upstream_dns = [
           "9.9.9.9"
           "149.112.112.112"
@@ -28,10 +27,8 @@ in
           "8.8.8.8"
           "8.8.4.4"
         ];
-        # Performance settings
         cache_size = 4194304;
         upstream_mode = "load_balance";
-        # Security
         enable_dnssec = true;
         ratelimit = 30;
       };
@@ -42,12 +39,13 @@ in
         filtering_enabled = true;
         safebrowsing_enabled = true;
         
-        rewrites = [
-          {
-            domain = constants.hostnames.adguard;
+        # Auto-generate DNS rewrites for services with hostnames
+        rewrites = lib.mapAttrsToList 
+          (name: service: {
+            domain = service.hostname;
             answer = constants.network.staticIP;
-          }
-        ];
+          })
+          constants.nginxServices;
       };
       
       # Filter lists
@@ -81,7 +79,7 @@ in
 
   # Firewall
   networking.firewall = {
-    allowedTCPPorts = [ constants.ports.adguard constants.ports.dns ];
-    allowedUDPPorts = [ constants.ports.dns ];
+    allowedTCPPorts = [ 53 ];
+    allowedUDPPorts = [ 53 ];
   };
 }

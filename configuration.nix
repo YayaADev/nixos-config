@@ -7,6 +7,7 @@
     ./modules/system/basics.nix
     ./modules/shell/zsh.nix
     ./modules/services/ssh.nix
+    ./modules/services/nginx.nix
     ./modules/users/nixos.nix
     ./modules/system/networking.nix
     ./modules/development/vscode.nix
