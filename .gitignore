@@ -10,3 +10,5 @@ secrets.nix
 # Backups
 *.backup
 modules/users
+
+.vscode/
