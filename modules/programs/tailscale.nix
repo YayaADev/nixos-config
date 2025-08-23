@@ -1,7 +1,6 @@
 { config, lib, pkgs, ... }:
 let
   constants = import ../constants.nix;
-  secrets = import ../../secrets.nix;
 in
 {
   services.tailscale = {
@@ -9,7 +8,7 @@ in
     useRoutingFeatures = "both";
   };
 
-  # Enable required networking features for exit node functionality
+  # Exit node functionality
   networking = {
     firewall = {
       enable = true;
@@ -19,7 +18,6 @@ in
     };
   };
 
-  # Make tailscale command available system-wide
   environment.systemPackages = with pkgs; [
     tailscale
   ];
@@ -33,7 +31,7 @@ in
     serviceConfig = {
       Type = "oneshot";
       User = "root";
-      RemainAfterExit = true;  # Prevents re-running on every activation
+      RemainAfterExit = true;
     };
     script = ''
       # Wait for tailscaled to settle
@@ -57,19 +55,9 @@ in
         exit 0
       fi
 
-      # Read auth key from secrets file
-      if [ -f "${secrets.tailscaleAuthKeyFile}" ]; then
-        AUTH_KEY=$(cat "${secrets.tailscaleAuthKeyFile}")
-        echo "Using auth key from file"
-      else
-        echo "No auth key file found at ${secrets.tailscaleAuthKeyFile}"
-        exit 1
-      fi
-
-      # Authenticate with tailscale and configure as subnet router + exit node
-      echo "Authenticating with Tailscale and setting up routing"
+      echo "Authenticating with Tailscale using agenix secret"
       ${pkgs.tailscale}/bin/tailscale up \
-        --authkey="$AUTH_KEY" \
+        --authkey="$(cat ${config.age.secrets.tailscale-authkey.path})" \
         --advertise-routes=${constants.network.subnet} \
         --advertise-exit-node \
         --accept-routes=true \
@@ -78,7 +66,7 @@ in
     '';
   };
 
-  # Optional: Service to automatically obtain TLS certificates
+  # Automatically obtain TLS certificates
   systemd.services.tailscale-cert-renewal = {
     description = "Renew Tailscale TLS certificates";
     serviceConfig = {

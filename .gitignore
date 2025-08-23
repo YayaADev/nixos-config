@@ -4,11 +4,14 @@ hardware-configuration.nix
 # Build results
 result*
 
-# Secrets
-secrets.nix
+# auth
+tailscale-authkey.age
 
 # Backups
 *.backup
 modules/users
 
 .vscode/
+tailscale-authkey
+nix
+envVars.nix

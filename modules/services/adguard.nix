@@ -16,7 +16,7 @@ in
       # DNS configuration
       dns = {
         bind_hosts = [ "0.0.0.0" ];
-        port = 53;  # Standard DNS port - hardcoded since it's not a separate service
+        port = 53;  # Standard DNS port
         upstream_dns = [
           "9.9.9.9"
           "149.112.112.112"
@@ -33,7 +33,6 @@ in
         ratelimit = 30;
       };
       
-      # Filtering section
       filtering = {
         protection_enabled = true;
         filtering_enabled = true;

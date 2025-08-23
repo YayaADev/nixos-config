@@ -1,5 +1,5 @@
 let
-  secrets = import ../secrets.nix;
+  secrets = import ../envVars.nix;
   lib = import <nixpkgs/lib>;
   
   # Define services (removed SSH as requested)
