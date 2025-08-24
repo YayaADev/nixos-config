@@ -19,6 +19,8 @@
     ./modules/users/nixos.nix
     ./modules/system/networking.nix
     ./modules/services/jellyfin.nix 
+    ./modules/services/cloudflared.nix
+    
     # Programs
     ./modules/programs/nix-tools.nix
     ./modules/programs/vscode.nix

@@ -9,5 +9,12 @@
       group = "root";
       mode = "0400";
     };
+
+  cloudflared-creds = {
+      file = ../../secrets/cloudflared-creds.age;
+      owner = "cloudflared";
+      group = "cloudflared";
+      mode = "0400";
+    };
   };
 }

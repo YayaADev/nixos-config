@@ -6,7 +6,7 @@ result*
 
 # auth
 tailscale-authkey.age
-
+cloudflared-creds.age
 # Backups
 *.backup
 modules/users
