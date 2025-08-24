@@ -1,17 +1,16 @@
-# Hardware-specific
+# Hardware-specific configuration
 hardware-configuration.nix
 
 # Build results
 result*
 
-# auth
-tailscale-authkey.age
-cloudflared-creds.age
-# Backups
-*.backup
-modules/users
-
-.vscode/
-tailscale-authkey
-nix
+# Secrets and authentication
+*.age
 envVars.nix
+
+# Development tools
+.vscode/
+nix/
+
+# Backups and temporary files
+*.backup

@@ -1,8 +1,8 @@
 let
-  secrets = import ../envVars.nix;
+  secrets = import ./envVars.nix;
   lib = import <nixpkgs/lib>;
   
-  # Define services (removed SSH as requested)
+  # Define services 
   services = {
     # Core system services
     adguard = { 
@@ -15,7 +15,7 @@ let
       description = "Nginx Web Server"; 
     };
 
-        # Media services
+    # Media services
     jellyfin = {
       port = 8096;
       hostname = "jellyfin.home";

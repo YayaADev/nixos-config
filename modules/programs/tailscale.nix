@@ -1,6 +1,6 @@
 { config, lib, pkgs, ... }:
 let
-  constants = import ../constants.nix;
+  constants = import ../../constants.nix;
 in
 {
   services.tailscale = {
@@ -25,8 +25,14 @@ in
   # Systemd service for automatic authentication and configuration
   systemd.services.tailscale-autoconnect = {
     description = "Automatic connection to Tailscale with subnet routing";
-    after = [ "network-pre.target" "tailscale.service" ];
-    wants = [ "network-pre.target" "tailscale.service" ];
+    after = [
+      "network-pre.target"
+      "tailscale.service"
+    ];
+    wants = [
+      "network-pre.target"
+      "tailscale.service"
+    ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
@@ -39,7 +45,7 @@ in
 
       # Check if we are already authenticated to tailscale
       status="$(${pkgs.tailscale}/bin/tailscale status -json 2>/dev/null | ${pkgs.jq}/bin/jq -r .BackendState 2>/dev/null)" || status="NeedsLogin"
-      
+
       if [ "$status" = "Running" ]; then
         echo "Tailscale is already running"
         
@@ -76,7 +82,7 @@ in
     script = ''
       # Get the tailscale machine name
       MACHINE_NAME=$(${pkgs.tailscale}/bin/tailscale status --json 2>/dev/null | ${pkgs.jq}/bin/jq -r '.Self.DNSName' | sed 's/\.$//') 2>/dev/null || echo ""
-      
+
       if [ -n "$MACHINE_NAME" ]; then
         echo "Obtaining certificate for $MACHINE_NAME"
         ${pkgs.tailscale}/bin/tailscale cert "$MACHINE_NAME" --cert-dir /var/lib/tailscale-certs/ || true
