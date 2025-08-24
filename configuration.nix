@@ -18,7 +18,7 @@
     ./modules/services/adguard.nix
     ./modules/users/nixos.nix
     ./modules/system/networking.nix
-
+    ./modules/services/jellyfin.nix 
     # Programs
     ./modules/programs/nix-tools.nix
     ./modules/programs/vscode.nix

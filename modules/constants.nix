@@ -15,6 +15,13 @@ let
       description = "Nginx Web Server"; 
     };
 
+        # Media services
+    jellyfin = {
+      port = 8096;
+      hostname = "jellyfin.home";
+      description = "Jellyfin Media Server";
+    };
+
     # Obsidian Notes Sync
     webdav = {
       port = 5005;
