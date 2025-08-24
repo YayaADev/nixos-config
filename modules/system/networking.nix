@@ -25,6 +25,11 @@ in
     ];
   };
 
+  # Open firewall for all service ports
+  networking.firewall = {
+    allowedTCPPorts = constants.allTcpPorts;
+  };
+
   environment.systemPackages = with pkgs; [
     nmap
     arp-scan

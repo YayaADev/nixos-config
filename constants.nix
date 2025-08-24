@@ -2,9 +2,7 @@ let
   secrets = import ./envVars.nix;
   lib = import <nixpkgs/lib>;
   
-  # Define services 
   services = {
-    # Core system services
     adguard = { 
       port = 3000; 
       hostname = "adguard.home"; 
@@ -21,8 +19,31 @@ let
       hostname = "jellyfin.home";
       description = "Jellyfin Media Server";
     };
-
-    # Obsidian Notes Sync
+    sonarr = {
+      port = 8989;
+      hostname = "sonarr.home";
+      description = "Sonarr TV Series Management";
+    };
+    radarr = {
+      port = 7878;
+      hostname = "radarr.home";
+      description = "Radarr Movie Management";
+    };
+    prowlarr = {
+      port = 9696;
+      hostname = "prowlarr.home";
+      description = "Prowlarr Indexer Manager";
+    };
+    bazarr = {
+      port = 6767;
+      hostname = "bazarr.home";
+      description = "Bazarr Subtitle Management";
+    };
+    flaresolverr = {
+      port = 8191;
+      hostname = "flaresolverr.home";
+      description = "FlareSolverr CloudFlare Solver";
+    };
     webdav = {
       port = 5005;
       hostname = "webdav.home";

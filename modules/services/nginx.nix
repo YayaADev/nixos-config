@@ -26,9 +26,4 @@ virtualHosts = lib.mapAttrs' (serviceName: serviceConfig: {
 }) constants.nginxServices;
 
   };
-
-  # Open firewall for all service ports
-  networking.firewall = {
-    allowedTCPPorts = constants.allTcpPorts;
-  };
 }
