@@ -10,8 +10,8 @@
 
   # Ensure jellyfin user has access to media directories
   systemd.tmpfiles.rules = [
-    "d /var/lib/jellyfin 0755 jellyfin jellyfin -"
-    "d /var/cache/jellyfin 0755 jellyfin jellyfin -"
+    "Z /var/lib/jellyfin 0755 jellyfin jellyfin -"
+    "Z /var/cache/jellyfin 0755 jellyfin jellyfin -"
     "Z /data/media 0755 jellyfin jellyfin -"
   ];
 
