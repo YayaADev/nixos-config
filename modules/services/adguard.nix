@@ -1,22 +1,20 @@
 # Adguard wiki https://wiki.nixos.org/wiki/Adguard_Home
-{ config, lib, pkgs, ... }:
-let
+{lib, ...}: let
   constants = import ../../constants.nix;
-    serviceConfig = constants.services.adguard;
-in
-{
+  serviceConfig = constants.services.adguard;
+in {
   services.adguardhome = {
     enable = true;
     mutableSettings = false;
     settings = {
       # Web interface
-     http = {
+      http = {
         address = "0.0.0.0:${toString serviceConfig.port}";
       };
       # DNS configuration
       dns = {
-        bind_hosts = [ "0.0.0.0" ];
-        port = 53;  # Standard DNS port
+        bind_hosts = ["0.0.0.0"];
+        port = 53; # Standard DNS port
         upstream_dns = [
           "9.9.9.9"
           "149.112.112.112"
@@ -32,21 +30,22 @@ in
         enable_dnssec = true;
         ratelimit = 30;
       };
-      
+
       filtering = {
         protection_enabled = true;
         filtering_enabled = true;
         safebrowsing_enabled = true;
-        
+
         # Auto-generate DNS rewrites for services with hostnames
-        rewrites = lib.mapAttrsToList 
-          (name: service: {
+        rewrites =
+          lib.mapAttrsToList
+          (_name: service: {
             domain = service.hostname;
             answer = constants.network.staticIP;
           })
           constants.nginxServices;
       };
-      
+
       # Filter lists
       filters = [
         {
@@ -70,7 +69,7 @@ in
           name = "Malware Blocklist";
         }
       ];
-      
+
       querylog.enabled = true;
       statistics.enabled = true;
     };
@@ -78,7 +77,7 @@ in
 
   # Firewall
   networking.firewall = {
-    allowedTCPPorts = [ 53 ];
-    allowedUDPPorts = [ 53 ];
+    allowedTCPPorts = [53];
+    allowedUDPPorts = [53];
   };
 }

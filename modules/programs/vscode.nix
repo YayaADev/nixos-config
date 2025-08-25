@@ -1,6 +1,8 @@
-{ config, lib, pkgs, ... }:
-
 {
+  lib,
+  pkgs,
+  ...
+}: {
   # === VS CODE REMOTE SSH SUPPORT ===
   programs.nix-ld = {
     enable = true;
@@ -23,11 +25,11 @@
     serviceConfig = {
       ExecStart = "${pkgs.writeShellScript "auto-fix-vscode-server" ''
         set -euo pipefail
-        PATH=${lib.makeBinPath (with pkgs; [ coreutils inotify-tools findutils ])}
-        
+        PATH=${lib.makeBinPath (with pkgs; [coreutils inotify-tools findutils])}
+
         nodePath="${pkgs.nodejs_18}/bin/node"
         bin_dir="$HOME/.vscode-server/bin"
-        
+
         [[ -e "$bin_dir" ]] && \
         find "$bin_dir" -mindepth 2 -maxdepth 2 -name node -type f -exec ln -sfT "$nodePath" {} \; || \
         mkdir -p "$bin_dir"
@@ -45,6 +47,6 @@
       Restart = "always";
       RestartSec = "0";
     };
-    wantedBy = [ "default.target" ];
+    wantedBy = ["default.target"];
   };
 }

@@ -1,9 +1,7 @@
-{ config, lib, pkgs, serviceHelpers, ... }:
-let
+{serviceHelpers, ...}: let
   constants = import ../../constants.nix;
   serviceConfig = constants.services.radarr;
-in
-{
+in {
   services.radarr = {
     enable = true;
     openFirewall = false;
@@ -11,7 +9,9 @@ in
     group = "radarr";
   };
 
-  systemd.tmpfiles.rules = serviceHelpers.createServiceDirectories "radarr" serviceConfig ++ [
-    "Z /data/media 0775 radarr radarr -"
-  ];
+  systemd.tmpfiles.rules =
+    serviceHelpers.createServiceDirectories "radarr" serviceConfig
+    ++ [
+      "Z /data/media 0775 radarr radarr -"
+    ];
 }

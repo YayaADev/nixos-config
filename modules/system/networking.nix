@@ -1,8 +1,6 @@
-{ config, lib, pkgs, ... }:
-let
+{pkgs, ...}: let
   constants = import ../../constants.nix;
-in
-{
+in {
   networking = {
     hostName = "nixos-cm3588";
     # Try static IP first, fall back to DHCP

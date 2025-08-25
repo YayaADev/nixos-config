@@ -3,19 +3,16 @@
   config,
   lib,
   pkgs,
-  serviceHelpers,
   ...
-}:
-let
+}: let
   constants = import ../../constants.nix;
   grafanaConfig = constants.services.grafana;
   prometheusConfig = constants.services.prometheus;
-in
-{
+in {
   # Prometheus - metrics collection
   services.prometheus = {
     enable = true;
-    port = prometheusConfig.port;
+    inherit (prometheusConfig) port;
 
     # Exporters for system metrics
     exporters = {
@@ -46,38 +43,39 @@ in
     };
 
     # Scrape configurations
-    scrapeConfigs = [
-      {
-        job_name = "node";
-        static_configs = [
-          {
-            targets = [ "localhost:${toString config.services.prometheus.exporters.node.port}" ];
-          }
-        ];
-        scrape_interval = "15s";
-      }
-      {
-        job_name = "systemd";
-        static_configs = [
-          {
-            targets = [ "localhost:${toString config.services.prometheus.exporters.systemd.port}" ];
-          }
-        ];
-        scrape_interval = "15s";
-      }
-      # Add nginx monitoring if enabled
-    ]
-    ++ lib.optionals config.services.nginx.enable [
-      {
-        job_name = "nginx";
-        static_configs = [
-          {
-            targets = [ "localhost:${toString config.services.prometheus.exporters.nginx.port}" ];
-          }
-        ];
-        scrape_interval = "15s";
-      }
-    ];
+    scrapeConfigs =
+      [
+        {
+          job_name = "node";
+          static_configs = [
+            {
+              targets = ["localhost:${toString config.services.prometheus.exporters.node.port}"];
+            }
+          ];
+          scrape_interval = "15s";
+        }
+        {
+          job_name = "systemd";
+          static_configs = [
+            {
+              targets = ["localhost:${toString config.services.prometheus.exporters.systemd.port}"];
+            }
+          ];
+          scrape_interval = "15s";
+        }
+        # Add nginx monitoring if enabled
+      ]
+      ++ lib.optionals config.services.nginx.enable [
+        {
+          job_name = "nginx";
+          static_configs = [
+            {
+              targets = ["localhost:${toString config.services.prometheus.exporters.nginx.port}"];
+            }
+          ];
+          scrape_interval = "15s";
+        }
+      ];
 
     # Alerting rules
     rules = [
@@ -92,7 +90,7 @@ in
               severity: warning
             annotations:
               summary: High CPU usage detected
-              
+
           - alert: HighMemoryUsage
             expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 85
             for: 5m
@@ -100,7 +98,7 @@ in
               severity: warning
             annotations:
               summary: High memory usage detected
-              
+
           - alert: DiskSpaceLow
             expr: node_filesystem_avail_bytes{fstype!="tmpfs"} / node_filesystem_size_bytes{fstype!="tmpfs"} * 100 < 10
             for: 5m
@@ -108,7 +106,7 @@ in
               severity: critical
             annotations:
               summary: Disk space running low
-              
+
           - alert: ServiceDown
             expr: up == 0
             for: 2m
@@ -174,8 +172,8 @@ in
   # Download community dashboards
   systemd.services.grafana-setup-dashboards = {
     description = "Setup Grafana dashboards";
-    after = [ "grafana.service" ];
-    wantedBy = [ "multi-user.target" ];
+    after = ["grafana.service"];
+    wantedBy = ["multi-user.target"];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
@@ -188,7 +186,7 @@ in
       ${pkgs.curl}/bin/curl -so /var/lib/grafana/dashboards/node-exporter.json \
         https://grafana.com/api/dashboards/1860/revisions/37/download
 
-      # System overview dashboard  
+      # System overview dashboard
       ${pkgs.curl}/bin/curl -so /var/lib/grafana/dashboards/system-overview.json \
         https://grafana.com/api/dashboards/11074/revisions/9/download
     '';

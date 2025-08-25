@@ -1,6 +1,4 @@
-{ config, pkgs, ... }:
-
-{
+{pkgs, ...}: {
   programs.zsh = {
     enable = true;
     enableCompletion = true;
@@ -11,12 +9,12 @@
     ohMyZsh = {
       enable = true;
       theme = "robbyrussell";
-      plugins = [ 
-        "git" 
-        "sudo" 
-        "command-not-found" 
-        "history" 
-        "colored-man-pages" 
+      plugins = [
+        "git"
+        "sudo"
+        "command-not-found"
+        "history"
+        "colored-man-pages"
       ];
     };
 
@@ -67,7 +65,7 @@
       storage-info = "df -h /data && echo && btrfs filesystem usage /data";
     };
 
-    # shellInit 
+    # shellInit
     shellInit = ''
       # History
       HISTSIZE=10000

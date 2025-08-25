@@ -1,8 +1,10 @@
-{ config, lib, pkgs, ... }:
-let
-  constants = import ../../constants.nix;
-in
 {
+  config,
+  pkgs,
+  ...
+}: let
+  constants = import ../../constants.nix;
+in {
   services.tailscale = {
     enable = true;
     useRoutingFeatures = "both";
@@ -12,8 +14,8 @@ in
   networking = {
     firewall = {
       enable = true;
-      allowedUDPPorts = [ config.services.tailscale.port ];
-      trustedInterfaces = [ "tailscale0" ];
+      allowedUDPPorts = [config.services.tailscale.port];
+      trustedInterfaces = ["tailscale0"];
       checkReversePath = "loose";
     };
   };
@@ -33,7 +35,7 @@ in
       "network-pre.target"
       "tailscale.service"
     ];
-    wantedBy = [ "multi-user.target" ];
+    wantedBy = ["multi-user.target"];
     serviceConfig = {
       Type = "oneshot";
       User = "root";
@@ -48,7 +50,7 @@ in
 
       if [ "$status" = "Running" ]; then
         echo "Tailscale is already running"
-        
+
         # Use --reset to avoid configuration conflicts
         echo "Re-advertising subnet routes and exit node capability with --reset"
         ${pkgs.tailscale}/bin/tailscale up --reset \
@@ -57,7 +59,7 @@ in
           --accept-routes=true \
           --accept-dns=true \
           --hostname="nixos-home-server" || echo "Failed to update routes, but continuing..."
-        
+
         exit 0
       fi
 

@@ -1,9 +1,11 @@
-{ config, lib, pkgs, serviceHelpers, ... }:
-let
+{
+  pkgs,
+  serviceHelpers,
+  ...
+}: let
   constants = import ../../constants.nix;
   serviceConfig = constants.services.jellyfin;
-in
-{
+in {
   services.jellyfin = {
     enable = true;
     openFirewall = false; # We handle firewall centrally in networking.nix
@@ -12,11 +14,13 @@ in
   };
 
   # Automatically create necessary directories with proper permissions
-  systemd.tmpfiles.rules = serviceHelpers.createServiceDirectories "jellyfin" serviceConfig ++ [
-    # Additional jellyfin-specific directories
-    "Z /var/cache/jellyfin 0755 jellyfin jellyfin -"
-    "Z /data/media 0755 jellyfin jellyfin -"
-  ];
+  systemd.tmpfiles.rules =
+    serviceHelpers.createServiceDirectories "jellyfin" serviceConfig
+    ++ [
+      # Additional jellyfin-specific directories
+      "Z /var/cache/jellyfin 0755 jellyfin jellyfin -"
+      "Z /data/media 0755 jellyfin jellyfin -"
+    ];
 
   environment.systemPackages = with pkgs; [
     jellyfin
@@ -29,7 +33,7 @@ in
     enable = true;
   };
 
-  boot.kernelModules = [ "rockchip_rga" "rockchip_vdec" ];
+  boot.kernelModules = ["rockchip_rga" "rockchip_vdec"];
 
   services.udev.extraRules = ''
     SUBSYSTEM=="video4linux", KERNEL=="video[0-9]*", GROUP="video", MODE="0664"

@@ -19,7 +19,7 @@ let
       port = 7844; # Cloudflared internal port
       description = "Cloudflare Tunnel";
       systemUser = true;
-      extraGroups = [ ];
+      extraGroups = [];
     };
 
     # Media services
@@ -39,7 +39,7 @@ let
       hostname = "sonarr.home";
       description = "Sonarr TV Series Management";
       systemUser = true;
-      extraGroups = [ "users" ];
+      extraGroups = ["users"];
       createHome = true;
       homeDir = "/var/lib/sonarr";
     };
@@ -48,7 +48,7 @@ let
       hostname = "radarr.home";
       description = "Radarr Movie Management";
       systemUser = true;
-      extraGroups = [ "users" ];
+      extraGroups = ["users"];
       createHome = true;
       homeDir = "/var/lib/radarr";
     };
@@ -65,7 +65,7 @@ let
       hostname = "bazarr.home";
       description = "Bazarr Subtitle Management";
       systemUser = true;
-      extraGroups = [ "users" ];
+      extraGroups = ["users"];
       createHome = true;
       homeDir = "/var/lib/bazarr";
     };
@@ -81,7 +81,7 @@ let
       hostname = "qbittorrent.home";
       description = "qBittorrent BitTorrent Client";
       systemUser = true;
-      extraGroups = [ "users" ];
+      extraGroups = ["users"];
       createHome = true;
       homeDir = "/var/lib/qbittorrent";
     };
@@ -101,47 +101,45 @@ let
   };
 
   # Helper function to create system user configuration
-  createUserForSystemService =
-    serviceName: serviceConfig:
+  createUserForSystemService = serviceName: serviceConfig:
     lib.optionalAttrs (serviceConfig.systemUser or false) {
-      users.${serviceName} = {
-        isSystemUser = true;
-        description = serviceConfig.description;
-        group = serviceName;
-        extraGroups = serviceConfig.extraGroups or [ ];
-      }
-      // lib.optionalAttrs (serviceConfig.createHome or false) {
-        home = lib.mkForce (serviceConfig.homeDir or "/var/lib/${serviceName}");
-        createHome = true;
-      };
+      users.${serviceName} =
+        {
+          isSystemUser = true;
+          inherit (serviceConfig) description;
+          group = serviceName;
+          extraGroups = serviceConfig.extraGroups or [];
+        }
+        // lib.optionalAttrs (serviceConfig.createHome or false) {
+          home = lib.mkForce (serviceConfig.homeDir or "/var/lib/${serviceName}");
+          createHome = true;
+        };
 
-      groups.${serviceName} = { };
+      groups.${serviceName} = {};
     };
-
-in
-{
+in {
   network = {
-    staticIP = secrets.staticIP;
-    gateway = secrets.gateway;
-    interface = secrets.interface;
-    subnet = secrets.subnet;
+    inherit (secrets) staticIP;
+    inherit (secrets) gateway;
+    inherit (secrets) interface;
+    inherit (secrets) subnet;
   };
 
   # Services configuration
-  services = services;
+  inherit services;
 
   # Helper functions to extract data
-  ports = lib.mapAttrs (name: service: service.port) services;
+  ports = lib.mapAttrs (_name: service: service.port) services;
 
   # Services that have hostnames (for nginx virtual hosts)
-  nginxServices = lib.filterAttrs (name: service: service ? hostname) services;
+  nginxServices = lib.filterAttrs (_name: service: service ? hostname) services;
 
   # Services that need system users
-  systemServices = lib.filterAttrs (name: service: service.systemUser or false) services;
+  systemServices = lib.filterAttrs (_name: service: service.systemUser or false) services;
 
   # All TCP ports that need to be opened in firewall
-  allTcpPorts = lib.attrValues (lib.mapAttrs (name: service: service.port) services);
+  allTcpPorts = lib.attrValues (lib.mapAttrs (_name: service: service.port) services);
 
   # Function to create users for system services
-  createUserForSystemService = createUserForSystemService;
+  inherit createUserForSystemService;
 }

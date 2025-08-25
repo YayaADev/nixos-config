@@ -1,18 +1,9 @@
-{ config, pkgs, ... }:
-
-{
-  boot.supportedFilesystems = [ "btrfs" ];
+{pkgs, ...}: {
+  boot.supportedFilesystems = ["btrfs"];
 
   environment.systemPackages = with pkgs; [
     btrfs-progs
     compsize
-  ];
-
-  # Ensure mountpoints exist before mounts
-  systemd.tmpfiles.rules = [
-    "d /data 0755 root root -"
-    "d /data/media 0755 root root -"
-    "d /data/obsidian 0755 root root -"
   ];
 
   fileSystems = {
@@ -38,7 +29,7 @@
         "noatime"
         "subvol=media"
       ];
-      depends = [ "/data" ];
+      depends = ["/data"];
     };
 
     "/data/obsidian" = {
@@ -51,60 +42,67 @@
         "noatime"
         "subvol=obsidian"
       ];
-      depends = [ "/data" ];
+      depends = ["/data"];
     };
   };
 
-  # Create symlinks for convenience
-  systemd.services.setup-storage-links = {
-    description = "Setup storage symlinks";
-    after = [ "local-fs.target" ];
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
+  systemd = {
+    tmpfiles.rules = [
+      "d /data 0755 root root -"
+      "d /data/media 0755 root root -"
+      "d /data/obsidian 0755 root root -"
+    ];
+
+    services = {
+      setup-storage-links = {
+        description = "Setup storage symlinks";
+        after = ["local-fs.target"];
+        wantedBy = ["multi-user.target"];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+        };
+        script = ''
+          ln -sfn /data/media/movies /movies
+          ln -sfn /data/media/tv /tv
+          ln -sfn /data/media /media
+          ln -sfn /data/obsidian /obsidian
+          chown -R 1000:1000 /data/media /data/obsidian 2>/dev/null || true
+        '';
+      };
+
+      setup-user-links = {
+        description = "Setup /data symlink in home";
+        after = ["local-fs.target"];
+        wantedBy = ["multi-user.target"];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+        };
+        script = ''
+          ln -sfn /data /home/nixos/data
+          chown -R nixos:users /home/nixos/data
+        '';
+      };
+
+      btrfs-scrub = {
+        description = "Btrfs scrub on /data";
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = "${pkgs.btrfs-progs}/bin/btrfs scrub start -B /data";
+        };
+      };
     };
-    script = ''
-      ln -sfn /data/media/movies /movies
-      ln -sfn /data/media/tv /tv
-      ln -sfn /data/media /media
-      ln -sfn /data/obsidian /obsidian
 
-      # Ensure proper permissions for your user (UID 1000)
-      chown -R 1000:1000 /data/media /data/obsidian 2>/dev/null || true
-    '';
-  };
-
-systemd.services.setup-user-links = {
-  description = "Setup /data symlink in home";
-  after = [ "local-fs.target" ];
-  wantedBy = [ "multi-user.target" ];
-  serviceConfig = {
-    Type = "oneshot";
-    RemainAfterExit = true;
-  };
-  script = ''
-    # Link /data into /home/nixos/data
-    ln -sfn /data /home/nixos/data
-    chown -R nixos:users /home/nixos/data
-  '';
-};
-
-  # Monthly Btrfs scrub
-  systemd.services.btrfs-scrub = {
-    description = "Btrfs scrub on /data";
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${pkgs.btrfs-progs}/bin/btrfs scrub start -B /data";
-    };
-  };
-
-  systemd.timers.btrfs-scrub = {
-    description = "Monthly Btrfs scrub";
-    wantedBy = [ "timers.target" ];
-    timerConfig = {
-      OnCalendar = "monthly";
-      Persistent = true;
+    timers = {
+      btrfs-scrub = {
+        description = "Monthly Btrfs scrub";
+        wantedBy = ["timers.target"];
+        timerConfig = {
+          OnCalendar = "monthly";
+          Persistent = true;
+        };
+      };
     };
   };
 }

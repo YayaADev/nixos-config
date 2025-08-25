@@ -1,9 +1,7 @@
-{ config, lib, pkgs, serviceHelpers, ... }:
-let
+{serviceHelpers, ...}: let
   constants = import ../../constants.nix;
   serviceConfig = constants.services.prowlarr;
-in
-{
+in {
   services.prowlarr = {
     enable = true;
     openFirewall = false;

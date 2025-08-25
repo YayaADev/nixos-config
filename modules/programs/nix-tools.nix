@@ -1,30 +1,39 @@
-# modules/development/nix-tools.nix
-{ config, lib, pkgs, ... }:
-
 {
+  lib,
+  pkgs,
+  ...
+}: {
   # Install Nix development tools system-wide
   environment.systemPackages = with pkgs; [
-    # Language servers for Nix
+    # Language servers
     nixd
-    
-    # Additional Nix tools
-    nixpkgs-review    # Review nixpkgs PRs
-    nix-tree          # Visualize dependency trees
-    statix            # Linter for Nix
-    deadnix           # Remove unused Nix code
-    
-    # Development helpers
-    nix-init          # Generate Nix expressions from URLs
-    nix-update        # Update Nix expressions
+
+    # Formatters & linters
+    alejandra
+    statix
+    deadnix
+
+    # Nix utilities
+    nixpkgs-review
+    nix-tree
+    nix-init
+    nix-update
   ];
 
-  # Enable nix-ld for better VS Code compatibility
-  programs.nix-ld = {
-    enable = true;
-    libraries = with pkgs; [
-      # Add any additional libraries VS Code extensions might need
-      stdenv.cc.cc.lib
-      nodejs_18
-    ];
+  # Recommended shell & dev tools
+  programs = {
+    nix-ld = {
+      enable = true;
+      libraries = with pkgs; [
+        stdenv.cc.cc.lib
+        nodejs_18
+      ];
+    };
+
+    git.enable = true;
+    zsh.enable = true;
   };
+
+  # Make Alejandra the default formatter for nix-ide
+  environment.variables.NIX_FORMATTER = "alejandra";
 }

@@ -1,6 +1,4 @@
-{ config, lib, pkgs, ... }:
-
-{
+_: {
   # === BOOT CONFIGURATION ===
   boot.loader.grub.enable = false;
   boot.loader.generic-extlinux-compatible.enable = true;

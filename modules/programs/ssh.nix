@@ -1,6 +1,4 @@
-{ config, pkgs, ... }:
-
-{
+_: {
   services.openssh = {
     enable = true;
     settings = {
@@ -11,6 +9,6 @@
 
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [ 22 ];
+    allowedTCPPorts = [22];
   };
 }
