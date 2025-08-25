@@ -44,11 +44,6 @@ let
       hostname = "flaresolverr.home";
       description = "FlareSolverr CloudFlare Solver";
     };
-    webdav = {
-      port = 5005;
-      hostname = "webdav.home";
-      description = "WebDAV File Sync";
-    };
   };
   
 in
