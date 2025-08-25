@@ -7,9 +7,6 @@
     # Language servers for Nix
     nixd
     
-    # Formatters
-    nixfmt-rfc-style
-    
     # Additional Nix tools
     nixpkgs-review    # Review nixpkgs PRs
     nix-tree          # Visualize dependency trees

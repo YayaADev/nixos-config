@@ -1,5 +1,8 @@
-{ config, lib, pkgs, ... }:
-
+{ config, lib, pkgs, serviceHelpers, ... }:
+let
+  constants = import ../../constants.nix;
+  serviceConfig = constants.services.bazarr;
+in
 {
   services.bazarr = {
     enable = true;
@@ -8,8 +11,7 @@
     group = "bazarr";
   };
 
-  systemd.tmpfiles.rules = [
-    "Z /var/lib/bazarr 0755 bazarr bazarr -"
+  systemd.tmpfiles.rules = serviceHelpers.createServiceDirectories "bazarr" serviceConfig ++ [
     "Z /data/media 0755 bazarr bazarr -"
   ];
 }

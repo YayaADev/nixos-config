@@ -2,6 +2,7 @@
 { config, lib, pkgs, ... }:
 let
   constants = import ../../constants.nix;
+    serviceConfig = constants.services.adguard;
 in
 {
   services.adguardhome = {
@@ -9,10 +10,9 @@ in
     mutableSettings = false;
     settings = {
       # Web interface
-      http = {
-        address = "0.0.0.0:${toString constants.services.adguard.port}";
+     http = {
+        address = "0.0.0.0:${toString serviceConfig.port}";
       };
-      
       # DNS configuration
       dns = {
         bind_hosts = [ "0.0.0.0" ];

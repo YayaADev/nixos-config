@@ -1,5 +1,8 @@
-{ config, lib, pkgs, ... }:
-
+{ config, lib, pkgs, serviceHelpers, ... }:
+let
+  constants = import ../../constants.nix;
+  serviceConfig = constants.services.sonarr;
+in
 {
   services.sonarr = {
     enable = true;
@@ -8,8 +11,7 @@
     group = "sonarr";
   };
 
-systemd.tmpfiles.rules = [
-  "Z /var/lib/sonarr 0755 sonarr sonarr -"
-  "Z /data/media 0775 sonarr sonarr -"
-];
+  systemd.tmpfiles.rules = serviceHelpers.createServiceDirectories "sonarr" serviceConfig ++ [
+    "Z /data/media 0775 sonarr sonarr -"
+  ];
 }

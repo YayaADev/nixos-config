@@ -1,83 +1,48 @@
 { config, pkgs, lib, ... }:
 let
   envVars = import ../../envVars.nix;
+  constants = import ../../constants.nix;
+  
+  # Function to create a system user for a service
+  createUserForSystemService = serviceName: serviceConfig: {
+    users.${serviceName} = {
+      isSystemUser = true;
+      description = serviceConfig.description;
+      group = serviceName;
+      extraGroups = serviceConfig.extraGroups or [];
+    } // lib.optionalAttrs (serviceConfig.createHome or false) {
+      home = lib.mkForce (serviceConfig.homeDir or "/var/lib/${serviceName}");
+      createHome = true;
+    };
+    
+    groups.${serviceName} = {};
+  };
+  
+  # Generate users and groups for all system services
+  systemServiceUsers = lib.foldlAttrs 
+    (acc: serviceName: serviceConfig: 
+      if (serviceConfig.systemUser or false) 
+      then lib.recursiveUpdate acc (createUserForSystemService serviceName serviceConfig)
+      else acc
+    ) 
+    { users = {}; groups = {}; } 
+    constants.services;
+
 in
 {
-  users.users.nixos = {
-    isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" ];
-    shell = pkgs.zsh;
-    openssh.authorizedKeys.keys = envVars.sshKeys;
-  };
+  # Regular user accounts
+  users.users = {
+    nixos = {
+      isNormalUser = true;
+      extraGroups = [ "wheel" "networkmanager" ];
+      shell = pkgs.zsh;
+      openssh.authorizedKeys.keys = envVars.sshKeys;
+    };
+  } // systemServiceUsers.users; # Merge system service users
 
-  users.users.cloudflared = {
-    isSystemUser = true;
-    description = "Cloudflared service user";
-    group = "cloudflared";
-  };
+  # System service groups
+  users.groups = systemServiceUsers.groups;
 
-  users.groups.cloudflared = {};
-
-  # Media service users
-  users.users.jellyfin = {
-    isSystemUser = true;
-    description = "Jellyfin Media Server";
-    group = "jellyfin";
-    extraGroups = [ "video" "render" "users" ];
-  };
-
-  users.groups.jellyfin = {};
-
-  users.users.sonarr = {
-    isSystemUser = true;
-    description = "Sonarr TV Series Manager";
-    group = "sonarr";
-    extraGroups = [ "users" ];
-    home = lib.mkForce "/var/lib/sonarr";
-    createHome = true;
-  };
-
-  users.groups.sonarr = {};
-
-  users.users.radarr = {
-    isSystemUser = true;
-    description = "Radarr Movie Manager";
-    group = "radarr";
-    extraGroups = [ "users" ];
-    home = lib.mkForce "/var/lib/radarr";
-    createHome = true;
-  };
-
-  users.groups.radarr = {};
-
-  users.users.prowlarr = {
-    isSystemUser = true;
-    description = "Prowlarr Indexer Manager";
-    group = "prowlarr";
-    home = lib.mkForce "/var/lib/prowlarr";
-    createHome = true;
-  };
-
-  users.groups.prowlarr = {};
-
-  users.users.bazarr = {
-    isSystemUser = true;
-    description = "Bazarr Subtitle Manager";
-    group = "bazarr";
-    extraGroups = [ "users" ];
-    home = lib.mkForce "/var/lib/bazarr";
-    createHome = true;
-  };
-
-  users.groups.bazarr = {};
-
-  users.users.flaresolverr = {
-    isSystemUser = true;
-    description = "FlareSolverr CloudFlare Solver";
-    group = "flaresolverr";
-  };
-
-  users.groups.flaresolverr = {};
-
+  # Security settings
   security.sudo.wheelNeedsPassword = false;
 }

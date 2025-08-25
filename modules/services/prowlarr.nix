@@ -1,5 +1,8 @@
-{ config, lib, pkgs, ... }:
-
+{ config, lib, pkgs, serviceHelpers, ... }:
+let
+  constants = import ../../constants.nix;
+  serviceConfig = constants.services.prowlarr;
+in
 {
   services.prowlarr = {
     enable = true;
@@ -13,7 +16,5 @@
     };
   };
 
-  systemd.tmpfiles.rules = [
-    "Z /var/lib/prowlarr 0755 prowlarr prowlarr -"
-  ];
+  systemd.tmpfiles.rules = serviceHelpers.createServiceDirectories "prowlarr" serviceConfig;
 }

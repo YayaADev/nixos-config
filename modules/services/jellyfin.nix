@@ -1,16 +1,19 @@
-{ config, lib, pkgs, ... }:
-
+{ config, lib, pkgs, serviceHelpers, ... }:
+let
+  constants = import ../../constants.nix;
+  serviceConfig = constants.services.jellyfin;
+in
 {
   services.jellyfin = {
     enable = true;
-    openFirewall = true;
+    openFirewall = false; # We handle firewall centrally in networking.nix
     user = "jellyfin";
     group = "jellyfin";
   };
 
-  # Ensure jellyfin user has access to media directories
-  systemd.tmpfiles.rules = [
-    "Z /var/lib/jellyfin 0755 jellyfin jellyfin -"
+  # Automatically create necessary directories with proper permissions
+  systemd.tmpfiles.rules = serviceHelpers.createServiceDirectories "jellyfin" serviceConfig ++ [
+    # Additional jellyfin-specific directories
     "Z /var/cache/jellyfin 0755 jellyfin jellyfin -"
     "Z /data/media 0755 jellyfin jellyfin -"
   ];
