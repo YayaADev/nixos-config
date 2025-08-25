@@ -72,14 +72,15 @@ let
       systemUser = true;
     };
     
-    # Future services can be easily added here
-    # jellyseerr = {
-    #   port = 5055;
-    #   hostname = "jellyseerr.home";
-    #   description = "Jellyseerr Request Management";
-    #   systemUser = true;
-    #   extraGroups = [ "users" ];
-    # };
+    qbittorrent = {
+      port = 8090;
+      hostname = "qbittorrent.home";
+      description = "qBittorrent BitTorrent Client";
+      systemUser = true;
+      extraGroups = [ "users" ];
+      createHome = true;
+      homeDir = "/var/lib/qbittorrent";
+    };
   };
   
   # Helper function to create system user configuration
