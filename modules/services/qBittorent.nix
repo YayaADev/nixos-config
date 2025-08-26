@@ -19,11 +19,9 @@ in {
     group = qbtGroup;
     home = "/var/lib/${qbtUser}";
     createHome = true;
-    uid = 1000;
   };
 
   users.groups.${qbtGroup} = {
-    gid = 1000;
   };
 
   systemd = {

@@ -19,8 +19,6 @@ in {
       node = {
         enable = true;
         enabledCollectors = [
-          "systemd"
-          "processes"
           "network"
           "diskstats"
           "filesystem"
