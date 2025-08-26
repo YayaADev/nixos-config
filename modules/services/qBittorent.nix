@@ -1,7 +1,6 @@
 {
   config,
   pkgs,
-  serviceHelpers,
   ...
 }: let
   constants = import ../../constants.nix;
@@ -13,30 +12,26 @@
 in {
   virtualisation.podman.enable = true;
 
-  # Create qbittorrent user & group for volume mapping
+  # REQUIRED: Manual user creation for container UID/GID mapping
+  # Cannot use automatic system due to container PUID/PGID requirements
   users.users.${qbtUser} = {
     isSystemUser = true;
     group = qbtGroup;
     home = "/var/lib/${qbtUser}";
     createHome = true;
+    extraGroups = ["media"]; # Add to media group for /data/media access
   };
 
   users.groups.${qbtGroup} = {
   };
 
   systemd = {
-    tmpfiles.rules =
-      serviceHelpers.createServiceDirectories "qbittorrent" serviceConfig
-      ++ [
-        "d /var/lib/gluetun 0755 root root -"
-        "d /var/lib/${qbtUser} 0755 1000 1000 -"
-        "d /var/lib/${qbtUser}/qBittorrent 0755 1000 1000 -"
-        "d /var/lib/${qbtUser}/qBittorrent/config 0755 1000 1000 -"
-        "d /data/torrents 0755 1000 1000 -"
-        "d /data/torrents/incomplete 0755 1000 1000 -"
-        "d /data/torrents/complete 0755 1000 1000 -"
-        "Z /data/media 0775 1000 1000 -"
-      ];
+    tmpfiles.rules = [
+      "d /var/lib/gluetun 0755 root root -"
+      "d /var/lib/${qbtUser} 0755 ${qbtUser} ${qbtGroup} -"
+      "d /var/lib/${qbtUser}/qBittorrent 0755 ${qbtUser} ${qbtGroup} -"
+      "d /var/lib/${qbtUser}/qBittorrent/config 0755 ${qbtUser} ${qbtGroup} -"
+    ];
 
     services.qbittorrent-health-check = {
       description = "qBittorrent-nox and Gluetun health check";

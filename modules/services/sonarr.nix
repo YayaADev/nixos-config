@@ -9,9 +9,5 @@ in {
     group = "sonarr";
   };
 
-  systemd.tmpfiles.rules =
-    serviceHelpers.createServiceDirectories "sonarr" serviceConfig
-    ++ [
-      "Z /data/media 0775 sonarr sonarr -"
-    ];
+  systemd.tmpfiles.rules = serviceHelpers.createServiceDirectories "sonarr" serviceConfig;
 }

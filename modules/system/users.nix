@@ -53,8 +53,13 @@ in {
     }
     // systemServiceUsers.users; # Merge system service users
 
-  # System service groups
-  users.groups = systemServiceUsers.groups;
+  # System service groups + media group
+  users.groups =
+    systemServiceUsers.groups
+    // {
+      # Create the media group
+      ${constants.mediaGroup.name} = {};
+    };
 
   # Security settings
   security.sudo.wheelNeedsPassword = false;

@@ -9,9 +9,5 @@ in {
     group = "bazarr";
   };
 
-  systemd.tmpfiles.rules =
-    serviceHelpers.createServiceDirectories "bazarr" serviceConfig
-    ++ [
-      "Z /data/media 0755 bazarr bazarr -"
-    ];
+  systemd.tmpfiles.rules = serviceHelpers.createServiceDirectories "bazarr" serviceConfig;
 }

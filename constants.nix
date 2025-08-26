@@ -8,21 +8,21 @@ let
       port = 3000;
       hostname = "adguard.home";
       description = "AdGuard Home DNS";
-      systemUser = false; # AdGuard runs as its own service
+      systemUser = false;
     };
     nginx = {
       port = 80;
       description = "Nginx Web Server";
-      systemUser = false; # Nginx has its own user management
+      systemUser = false;
     };
     cloudflared = {
-      port = 7844; # Cloudflared internal port
+      port = 7844;
       description = "Cloudflare Tunnel";
       systemUser = true;
       extraGroups = [];
     };
 
-    # Media services
+    # Media services - now with media group in extraGroups
     jellyfin = {
       port = 8096;
       hostname = "jellyfin.home";
@@ -32,6 +32,7 @@ let
         "video"
         "render"
         "users"
+        "media" # Added media group
       ];
     };
     sonarr = {
@@ -39,7 +40,7 @@ let
       hostname = "sonarr.home";
       description = "Sonarr TV Series Management";
       systemUser = true;
-      extraGroups = ["users"];
+      extraGroups = ["users" "media"]; # Added media group
       createHome = true;
       homeDir = "/var/lib/sonarr";
     };
@@ -48,7 +49,7 @@ let
       hostname = "radarr.home";
       description = "Radarr Movie Management";
       systemUser = true;
-      extraGroups = ["users"];
+      extraGroups = ["users" "media"]; # Added media group
       createHome = true;
       homeDir = "/var/lib/radarr";
     };
@@ -65,7 +66,7 @@ let
       hostname = "bazarr.home";
       description = "Bazarr Subtitle Management";
       systemUser = true;
-      extraGroups = ["users"];
+      extraGroups = ["users" "media"]; # Added media group
       createHome = true;
       homeDir = "/var/lib/bazarr";
     };
@@ -81,7 +82,7 @@ let
       hostname = "qbittorrent.home";
       description = "qBittorrent BitTorrent Client";
       systemUser = true;
-      extraGroups = ["users"];
+      extraGroups = ["users" "media"]; # Added media group
       createHome = true;
       homeDir = "/var/lib/qbittorrent";
     };
@@ -90,14 +91,19 @@ let
       port = 3001;
       hostname = "grafana.home";
       description = "Grafana Dashboard";
-      systemUser = false; # Grafana service creates its own user
+      systemUser = false;
     };
     prometheus = {
       port = 9090;
       hostname = "prometheus.home";
       description = "Prometheus Metrics";
-      systemUser = false; # Grafana service creates its own user
+      systemUser = false;
     };
+  };
+
+  # Media group configuration
+  mediaGroup = {
+    name = "media";
   };
 
   # Helper function to create system user configuration
@@ -127,6 +133,9 @@ in {
 
   # Services configuration
   inherit services;
+
+  # Media group configuration
+  inherit mediaGroup;
 
   # Helper functions to extract data
   ports = lib.mapAttrs (_name: service: service.port) services;

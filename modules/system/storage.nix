@@ -1,4 +1,6 @@
-{pkgs, ...}: {
+{pkgs, ...}: let
+  constants = import ../../constants.nix;
+in {
   boot.supportedFilesystems = ["btrfs"];
 
   environment.systemPackages = with pkgs; [
@@ -49,7 +51,14 @@
   systemd = {
     tmpfiles.rules = [
       "d /data 0755 root root -"
-      "d /data/media 0755 root root -"
+      # Media directories with media group ownership and group write permissions
+      "d /data/media 0775 root ${constants.mediaGroup.name} -"
+      "d /data/media/movies 0775 root ${constants.mediaGroup.name} -"
+      "d /data/media/tv 0775 root ${constants.mediaGroup.name} -"
+      "d /data/torrents 0775 root ${constants.mediaGroup.name} -"
+      "d /data/torrents/incomplete 0775 root ${constants.mediaGroup.name} -"
+      "d /data/torrents/complete 0775 root ${constants.mediaGroup.name} -"
+      # Obsidian stays as is
       "d /data/obsidian 0755 root root -"
     ];
 
@@ -67,7 +76,15 @@
           ln -sfn /data/media/tv /tv
           ln -sfn /data/media /media
           ln -sfn /data/obsidian /obsidian
-          chown -R 1000:1000 /data/media /data/obsidian 2>/dev/null || true
+
+          # Set media group ownership with SGID for new files to inherit group
+          chown -R root:${constants.mediaGroup.name} /data/media /data/torrents 2>/dev/null || true
+          chmod -R g+w /data/media /data/torrents 2>/dev/null || true
+          find /data/media /data/torrents -type d -exec chmod 2775 {} \; 2>/dev/null || true
+
+          # Keep obsidian as nixos user with restricted permissions
+          chown -R nixos:users /data/obsidian 2>/dev/null || true
+          chmod -R 750 /data/obsidian 2>/dev/null || true  # Remove world access
         '';
       };
 

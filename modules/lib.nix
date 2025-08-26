@@ -2,10 +2,8 @@
   # Helper function to create systemd tmpfiles rules for a service
   createServiceDirectories = serviceName: serviceConfig:
     lib.optionals (serviceConfig.systemUser or false) [
+      "d /var/lib/${serviceName} 0755 ${serviceName} ${serviceName} -"
       "Z /var/lib/${serviceName} 0755 ${serviceName} ${serviceName} -"
-    ]
-    ++ lib.optionals (serviceConfig.mediaAccess or false) [
-      "Z /data/media 0775 ${serviceName} ${serviceName} -"
     ];
 
   # Helper function to create nginx virtual host for a service
@@ -32,7 +30,8 @@
   };
 
   # Batch functions for multiple services
-  createAllServiceDirectories = services: lib.flatten (lib.mapAttrsToList createServiceDirectories services);
+  createAllServiceDirectories = services:
+    lib.flatten (lib.mapAttrsToList createServiceDirectories services);
 
   createAllNginxVirtualHosts = staticIP: services:
     lib.foldlAttrs (
