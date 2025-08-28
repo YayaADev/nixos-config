@@ -43,6 +43,18 @@ let
         "media" # Added media group
       ];
     };
+    jellyseerr = {
+      port = 5055;
+      hostname = "jellyseerr.home";
+      description = "Jellyseerr Media Request Management";
+      systemUser = true;
+      extraGroups = [
+        "users"
+        "media"
+      ];
+      createHome = true;
+      homeDir = "/var/lib/jellyseerr";
+    };
     sonarr = {
       port = 8989;
       hostname = "sonarr.home";
