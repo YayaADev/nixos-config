@@ -19,7 +19,15 @@ let
       port = 7844;
       description = "Cloudflare Tunnel";
       systemUser = true;
-      extraGroups = [];
+      extraGroups = [ ];
+    };
+
+    # WebDAV service for Obsidian sync
+    webdav = {
+      port = 8080;
+      hostname = "webdav.home";
+      description = "WebDAV Server for Obsidian";
+      systemUser = false; # Uses nginx user
     };
 
     # Media services - now with media group in extraGroups
@@ -40,7 +48,10 @@ let
       hostname = "sonarr.home";
       description = "Sonarr TV Series Management";
       systemUser = true;
-      extraGroups = ["users" "media"]; # Added media group
+      extraGroups = [
+        "users"
+        "media"
+      ]; # Added media group
       createHome = true;
       homeDir = "/var/lib/sonarr";
     };
@@ -49,7 +60,10 @@ let
       hostname = "radarr.home";
       description = "Radarr Movie Management";
       systemUser = true;
-      extraGroups = ["users" "media"]; # Added media group
+      extraGroups = [
+        "users"
+        "media"
+      ]; # Added media group
       createHome = true;
       homeDir = "/var/lib/radarr";
     };
@@ -66,7 +80,10 @@ let
       hostname = "bazarr.home";
       description = "Bazarr Subtitle Management";
       systemUser = true;
-      extraGroups = ["users" "media"]; # Added media group
+      extraGroups = [
+        "users"
+        "media"
+      ]; # Added media group
       createHome = true;
       homeDir = "/var/lib/bazarr";
     };
@@ -82,7 +99,10 @@ let
       hostname = "qbittorrent.home";
       description = "qBittorrent BitTorrent Client";
       systemUser = true;
-      extraGroups = ["users" "media"]; # Added media group
+      extraGroups = [
+        "users"
+        "media"
+      ]; # Added media group
       createHome = true;
       homeDir = "/var/lib/qbittorrent";
     };
@@ -107,23 +127,24 @@ let
   };
 
   # Helper function to create system user configuration
-  createUserForSystemService = serviceName: serviceConfig:
+  createUserForSystemService =
+    serviceName: serviceConfig:
     lib.optionalAttrs (serviceConfig.systemUser or false) {
-      users.${serviceName} =
-        {
-          isSystemUser = true;
-          inherit (serviceConfig) description;
-          group = serviceName;
-          extraGroups = serviceConfig.extraGroups or [];
-        }
-        // lib.optionalAttrs (serviceConfig.createHome or false) {
-          home = lib.mkForce (serviceConfig.homeDir or "/var/lib/${serviceName}");
-          createHome = true;
-        };
+      users.${serviceName} = {
+        isSystemUser = true;
+        inherit (serviceConfig) description;
+        group = serviceName;
+        extraGroups = serviceConfig.extraGroups or [ ];
+      }
+      // lib.optionalAttrs (serviceConfig.createHome or false) {
+        home = lib.mkForce (serviceConfig.homeDir or "/var/lib/${serviceName}");
+        createHome = true;
+      };
 
-      groups.${serviceName} = {};
+      groups.${serviceName} = { };
     };
-in {
+in
+{
   network = {
     inherit (secrets) staticIP;
     inherit (secrets) gateway;

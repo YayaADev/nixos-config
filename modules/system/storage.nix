@@ -1,11 +1,14 @@
-{pkgs, ...}: let
+{ pkgs, ... }:
+let
   constants = import ../../constants.nix;
-in {
-  boot.supportedFilesystems = ["btrfs"];
+in
+{
+  boot.supportedFilesystems = [ "btrfs" ];
 
   environment.systemPackages = with pkgs; [
     btrfs-progs
     compsize
+    acl # Required for setfacl
   ];
 
   fileSystems = {
@@ -31,7 +34,7 @@ in {
         "noatime"
         "subvol=media"
       ];
-      depends = ["/data"];
+      depends = [ "/data" ];
     };
 
     "/data/obsidian" = {
@@ -44,7 +47,7 @@ in {
         "noatime"
         "subvol=obsidian"
       ];
-      depends = ["/data"];
+      depends = [ "/data" ];
     };
   };
 
@@ -58,15 +61,15 @@ in {
       "d /data/torrents 0775 root ${constants.mediaGroup.name} -"
       "d /data/torrents/incomplete 0775 root ${constants.mediaGroup.name} -"
       "d /data/torrents/complete 0775 root ${constants.mediaGroup.name} -"
-      # Obsidian stays as is
-      "d /data/obsidian 0755 root root -"
+      # Obsidian with nginx write access for WebDAV
+      "d /data/obsidian 0775 nginx nginx -"
     ];
 
     services = {
       setup-storage-links = {
         description = "Setup storage symlinks";
-        after = ["local-fs.target"];
-        wantedBy = ["multi-user.target"];
+        after = [ "local-fs.target" ];
+        wantedBy = [ "multi-user.target" ];
         serviceConfig = {
           Type = "oneshot";
           RemainAfterExit = true;
@@ -82,23 +85,29 @@ in {
           chmod -R g+w /data/media /data/torrents 2>/dev/null || true
           find /data/media /data/torrents -type d -exec chmod 2775 {} \; 2>/dev/null || true
 
-          # Keep obsidian as nixos user with restricted permissions
-          chown -R nixos:users /data/obsidian 2>/dev/null || true
-          chmod -R 750 /data/obsidian 2>/dev/null || true  # Remove world access
+          # Set obsidian permissions for WebDAV access
+          # Make nginx the owner so it can create files and directories
+          chown -R nginx:nginx /data/obsidian 2>/dev/null || true
+          chmod -R 755 /data/obsidian 2>/dev/null || true
+
+          # Also give nixos user access via group permissions
+          ${pkgs.acl}/bin/setfacl -R -m u:nixos:rwx /data/obsidian 2>/dev/null || true
+          ${pkgs.acl}/bin/setfacl -R -d -m u:nixos:rwx /data/obsidian 2>/dev/null || true
+          ${pkgs.acl}/bin/setfacl -R -d -m u:nginx:rwx /data/obsidian 2>/dev/null || true
         '';
       };
 
       setup-user-links = {
         description = "Setup /data symlink in home";
-        after = ["local-fs.target"];
-        wantedBy = ["multi-user.target"];
+        after = [ "local-fs.target" ];
+        wantedBy = [ "multi-user.target" ];
         serviceConfig = {
           Type = "oneshot";
           RemainAfterExit = true;
         };
         script = ''
           ln -sfn /data /home/nixos/data
-          chown -R nixos:users /home/nixos/data
+          chown -h nixos:users /home/nixos/data
         '';
       };
 
@@ -114,7 +123,7 @@ in {
     timers = {
       btrfs-scrub = {
         description = "Monthly Btrfs scrub";
-        wantedBy = ["timers.target"];
+        wantedBy = [ "timers.target" ];
         timerConfig = {
           OnCalendar = "monthly";
           Persistent = true;

@@ -103,7 +103,10 @@ in {
         VPN_TYPE = "openvpn";
         OPENVPN_USER = envVars.vpn.username;
         OPENVPN_PASSWORD = envVars.vpn.password;
-        SERVER_COUNTRIES = envVars.vpn.serverCountries or "Netherlands";
+        
+        PORT_FORWARD_ONLY = "on";  # Filter to only P2P servers (official Gluetun docs)
+        SERVER_COUNTRIES = "United States,Canada";
+        
         VPN_PORT_FORWARDING = "on";
         VPN_PORT_FORWARDING_PROVIDER = "protonvpn";
 
