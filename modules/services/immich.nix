@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   serviceHelpers,
   ...
@@ -8,30 +9,134 @@
 in {
   services.immich = {
     enable = true;
-    inherit (serviceConfig) port;
+    port = serviceConfig.port;
     host = "0.0.0.0";
     mediaLocation = "/data/photos";
 
-    # Allow web interface configuration - you can set to null for web config
+    # File-based configuration - official settings only
     settings = {
-      server = {
-        externalDomain = "http://${serviceConfig.hostname}";
-      };
-      # Optional: Configure upload limits
-      image = {
-        thumbnailResolution = 1440;
-      };
+      # FFmpeg settings - using only valid options from official schema
       ffmpeg = {
-        # Hardware acceleration for RK3588
-        accel = "vaapi";
-        accelDecode = true;
-        targetVideoCodec = "h264";
+        crf = 23; # Video quality (23 is high quality)
+        threads = 0; # Use all available threads
+        preset = "ultrafast"; # Encoding speed preset
+        accel = "vaapi"; # Hardware acceleration for RK3588
+        accelDecode = true; # Hardware decode
+        targetVideoCodec = "h264"; # Most compatible codec
         acceptedVideoCodecs = [
           "h264"
           "hevc"
-          "vp9"
-          "av1"
         ];
+        targetAudioCodec = "aac"; # Universal audio codec
+        acceptedAudioCodecs = [
+          "aac"
+          "mp3"
+          "libopus"
+        ]; # Fixed: correct codec names
+        acceptedContainers = [
+          "mov"
+          "mp4"
+          "webm"
+        ];
+        targetResolution = "720"; # String format, not "720p"
+        maxBitrate = "0"; # No limit
+        bframes = -1; # Auto
+        refs = 0; # Auto
+        gopSize = 0; # Auto keyframe interval
+        temporalAQ = false; # Temporal adaptive quantization
+        cqMode = "auto"; # Constant quality mode
+        twoPass = false; # Single pass encoding
+        preferredHwDevice = "auto"; # Auto hardware device selection
+        transcode = "required"; # Always transcode for compatibility
+        tonemap = "hable"; # HDR tone mapping
+      };
+
+      # Job concurrency settings
+      job = {
+        backgroundTask = {
+          concurrency = 5;
+        };
+        smartSearch = {
+          concurrency = 2;
+        };
+        metadataExtraction = {
+          concurrency = 5;
+        };
+        faceDetection = {
+          concurrency = 2;
+        };
+        search = {
+          concurrency = 5;
+        };
+        sidecar = {
+          concurrency = 5;
+        };
+        library = {
+          concurrency = 5;
+        };
+        migration = {
+          concurrency = 5;
+        };
+        thumbnailGeneration = {
+          concurrency = 3;
+        };
+        videoConversion = {
+          concurrency = 1;
+        };
+      };
+
+      # Basic settings that are definitely supported
+      storageTemplate = {
+        enabled = true;
+        template = "{{y}}/{{MM}}/{{filename}}"; # Simpler template
+      };
+
+      # Machine Learning - basic settings only
+      machineLearning = {
+        enabled = true;
+        facialRecognition = {
+          enabled = true;
+        };
+        clip = {
+          enabled = true;
+        };
+      };
+
+      # Basic server settings
+      server = {
+        externalDomain = "http://${serviceConfig.hostname}";
+      };
+
+      # Trash settings
+      trash = {
+        enabled = true;
+        days = 30;
+      };
+
+      # User settings
+      user = {
+        deleteDelay = 7;
+      };
+
+      # Logging
+      logging = {
+        enabled = true;
+        level = "log";
+      };
+
+      # New version check
+      newVersionCheck = {
+        enabled = true;
+      };
+
+      # Basic authentication
+      passwordLogin = {
+        enabled = true;
+      };
+
+      # Map settings - omit empty styles to avoid validation error
+      map = {
+        enabled = true;
       };
     };
   };
