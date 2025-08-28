@@ -11,7 +11,7 @@
       curl
       openssl
       gitMinimal
-      nodejs_18
+      nodejs_20
       python3
       zlib
       krb5
@@ -27,7 +27,7 @@
         set -euo pipefail
         PATH=${lib.makeBinPath (with pkgs; [coreutils inotify-tools findutils])}
 
-        nodePath="${pkgs.nodejs_18}/bin/node"
+        nodePath="${pkgs.nodejs_20}/bin/node"
         bin_dir="$HOME/.vscode-server/bin"
 
         [[ -e "$bin_dir" ]] && \

@@ -26,7 +26,7 @@
       enable = true;
       libraries = with pkgs; [
         stdenv.cc.cc.lib
-        nodejs_18
+        nodejs_20
       ];
     };
 
