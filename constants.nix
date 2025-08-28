@@ -19,7 +19,7 @@ let
       port = 7844;
       description = "Cloudflare Tunnel";
       systemUser = true;
-      extraGroups = [ ];
+      extraGroups = [];
     };
 
     # WebDAV service for Obsidian sync
@@ -30,7 +30,14 @@ let
       systemUser = false; # Uses nginx user
     };
 
-    # Media services - now with media group in extraGroups
+    immich = {
+      port = 3001;
+      hostname = "immich.home";
+      description = "Immich Photo Management";
+      systemUser = false;
+    };
+
+    # Media services
     jellyfin = {
       port = 8096;
       hostname = "jellyfin.home";
@@ -63,7 +70,7 @@ let
       extraGroups = [
         "users"
         "media"
-      ]; # Added media group
+      ];
       createHome = true;
       homeDir = "/var/lib/sonarr";
     };
@@ -75,7 +82,7 @@ let
       extraGroups = [
         "users"
         "media"
-      ]; # Added media group
+      ];
       createHome = true;
       homeDir = "/var/lib/radarr";
     };
@@ -95,7 +102,7 @@ let
       extraGroups = [
         "users"
         "media"
-      ]; # Added media group
+      ];
       createHome = true;
       homeDir = "/var/lib/bazarr";
     };
@@ -114,13 +121,13 @@ let
       extraGroups = [
         "users"
         "media"
-      ]; # Added media group
+      ];
       createHome = true;
       homeDir = "/var/lib/qbittorrent";
     };
 
     grafana = {
-      port = 3001;
+      port = 3002;
       hostname = "grafana.home";
       description = "Grafana Dashboard";
       systemUser = false;
@@ -139,24 +146,23 @@ let
   };
 
   # Helper function to create system user configuration
-  createUserForSystemService =
-    serviceName: serviceConfig:
+  createUserForSystemService = serviceName: serviceConfig:
     lib.optionalAttrs (serviceConfig.systemUser or false) {
-      users.${serviceName} = {
-        isSystemUser = true;
-        inherit (serviceConfig) description;
-        group = serviceName;
-        extraGroups = serviceConfig.extraGroups or [ ];
-      }
-      // lib.optionalAttrs (serviceConfig.createHome or false) {
-        home = lib.mkForce (serviceConfig.homeDir or "/var/lib/${serviceName}");
-        createHome = true;
-      };
+      users.${serviceName} =
+        {
+          isSystemUser = true;
+          inherit (serviceConfig) description;
+          group = serviceName;
+          extraGroups = serviceConfig.extraGroups or [];
+        }
+        // lib.optionalAttrs (serviceConfig.createHome or false) {
+          home = lib.mkForce (serviceConfig.homeDir or "/var/lib/${serviceName}");
+          createHome = true;
+        };
 
-      groups.${serviceName} = { };
+      groups.${serviceName} = {};
     };
-in
-{
+in {
   network = {
     inherit (secrets) staticIP;
     inherit (secrets) gateway;

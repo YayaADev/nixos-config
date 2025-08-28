@@ -8,7 +8,6 @@
 in {
   services.jellyfin = {
     enable = true;
-    openFirewall = false; # We handle firewall centrally in networking.nix
     user = "jellyfin";
     group = "jellyfin";
   };

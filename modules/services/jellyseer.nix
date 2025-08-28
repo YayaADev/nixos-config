@@ -2,15 +2,12 @@
   lib,
   serviceHelpers,
   ...
-}:
-let
+}: let
   constants = import ../../constants.nix;
   serviceConfig = constants.services.jellyseerr;
-in
-{
+in {
   services.jellyseerr = {
     enable = true;
-    openFirewall = false;
     inherit (serviceConfig) port;
   };
 

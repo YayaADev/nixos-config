@@ -19,7 +19,7 @@ in {
     group = qbtGroup;
     home = "/var/lib/${qbtUser}";
     createHome = true;
-    extraGroups = ["media"]; # Add to media group for /data/media access
+    extraGroups = ["media"];
   };
 
   users.groups.${qbtGroup} = {
@@ -103,10 +103,10 @@ in {
         VPN_TYPE = "openvpn";
         OPENVPN_USER = envVars.vpn.username;
         OPENVPN_PASSWORD = envVars.vpn.password;
-        
-        PORT_FORWARD_ONLY = "on";  # Filter to only P2P servers (official Gluetun docs)
+
+        PORT_FORWARD_ONLY = "on"; # Filter to only P2P servers (official Gluetun docs)
         SERVER_COUNTRIES = "United States,Canada";
-        
+
         VPN_PORT_FORWARDING = "on";
         VPN_PORT_FORWARDING_PROVIDER = "protonvpn";
 
