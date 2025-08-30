@@ -65,20 +65,14 @@ in {
   systemd = {
     tmpfiles.rules = [
       "d /data 0755 root root -"
-      # Media directories with media group ownership and group write permissions
-      "d /data/media 0775 root ${constants.mediaGroup.name} -"
-      "d /data/media/movies 0775 root ${constants.mediaGroup.name} -"
-      "d /data/media/tv 0775 root ${constants.mediaGroup.name} -"
-      "d /data/torrents 0775 root ${constants.mediaGroup.name} -"
-      "d /data/torrents/incomplete 0775 root ${constants.mediaGroup.name} -"
-      "d /data/torrents/complete 0775 root ${constants.mediaGroup.name} -"
-      # Photos directory - GROUP READABLE so immich group members can access
+      # Top-level media & torrents dirs
+      "d /data/media 2775 root ${constants.mediaGroup.name} -"
+      "d /data/torrents 2775 root ${constants.mediaGroup.name} -"
+
+      # Photos directory immich
       "d /data/photos 0750 immich immich -"
-      "d /data/photos/upload 0750 immich immich -"
-      "d /data/photos/library 0750 immich immich -"
-      "d /data/photos/thumbs 0750 immich immich -"
-      "d /data/photos/encoded-video 0750 immich immich -"
-      # Obsidian with nginx write access for WebDAV
+
+      # Obsidian directory (for nginx)
       "d /data/obsidian 0775 nginx nginx -"
     ];
 
