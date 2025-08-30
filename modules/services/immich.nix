@@ -1,5 +1,4 @@
 {
-  config,
   lib,
   serviceHelpers,
   ...
@@ -9,15 +8,13 @@
 in {
   services.immich = {
     enable = true;
-    port = serviceConfig.port;
+    inherit (serviceConfig) port;
     host = "0.0.0.0";
     mediaLocation = "/data/photos";
 
-    # File-based configuration - official settings only
     settings = {
-      # FFmpeg settings - using only valid options from official schema
       ffmpeg = {
-        crf = 23; # Video quality (23 is high quality)
+        crf = 23;
         threads = 0; # Use all available threads
         preset = "ultrafast"; # Encoding speed preset
         accel = "vaapi"; # Hardware acceleration for RK3588
@@ -27,12 +24,12 @@ in {
           "h264"
           "hevc"
         ];
-        targetAudioCodec = "aac"; # Universal audio codec
+        targetAudioCodec = "aac";
         acceptedAudioCodecs = [
           "aac"
           "mp3"
           "libopus"
-        ]; # Fixed: correct codec names
+        ];
         acceptedContainers = [
           "mov"
           "mp4"
@@ -85,13 +82,11 @@ in {
         };
       };
 
-      # Basic settings that are definitely supported
       storageTemplate = {
         enabled = true;
         template = "{{y}}/{{MM}}/{{filename}}"; # Simpler template
       };
 
-      # Machine Learning - basic settings only
       machineLearning = {
         enabled = true;
         facialRecognition = {
@@ -102,46 +97,38 @@ in {
         };
       };
 
-      # Basic server settings
       server = {
         externalDomain = "http://${serviceConfig.hostname}";
       };
 
-      # Trash settings
       trash = {
         enabled = true;
         days = 30;
       };
 
-      # User settings
       user = {
         deleteDelay = 7;
       };
 
-      # Logging
       logging = {
         enabled = true;
         level = "log";
       };
 
-      # New version check
       newVersionCheck = {
         enabled = true;
       };
 
-      # Basic authentication
       passwordLogin = {
         enabled = true;
       };
 
-      # Map settings - omit empty styles to avoid validation error
       map = {
         enabled = true;
       };
     };
   };
 
-  # Add immich user to video and render groups for hardware access
   users.users.immich.extraGroups = [
     "video"
     "render"

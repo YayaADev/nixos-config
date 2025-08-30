@@ -1,11 +1,4 @@
-{
-  config,
-  lib,
-  pkgs,
-  serviceHelpers,
-  ...
-}: let
-  constants = import ../../constants.nix;
+{pkgs, ...}: let
   envVars = import ../../envVars.nix;
 in {
   services.recyclarr = {

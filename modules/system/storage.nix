@@ -72,12 +72,12 @@ in {
       "d /data/torrents 0775 root ${constants.mediaGroup.name} -"
       "d /data/torrents/incomplete 0775 root ${constants.mediaGroup.name} -"
       "d /data/torrents/complete 0775 root ${constants.mediaGroup.name} -"
-      # Photos directory for Immich
-      "d /data/photos 0755 immich immich -"
-      "d /data/photos/upload 0755 immich immich -"
-      "d /data/photos/library 0755 immich immich -"
-      "d /data/photos/thumbs 0755 immich immich -"
-      "d /data/photos/encoded-video 0755 immich immich -"
+      # Photos directory - GROUP READABLE so immich group members can access
+      "d /data/photos 0750 immich immich -"
+      "d /data/photos/upload 0750 immich immich -"
+      "d /data/photos/library 0750 immich immich -"
+      "d /data/photos/thumbs 0750 immich immich -"
+      "d /data/photos/encoded-video 0750 immich immich -"
       # Obsidian with nginx write access for WebDAV
       "d /data/obsidian 0775 nginx nginx -"
     ];
@@ -103,16 +103,17 @@ in {
           chmod -R g+w /data/media /data/torrents 2>/dev/null || true
           find /data/media /data/torrents -type d -exec chmod 2775 {} \; 2>/dev/null || true
 
-          # Set immich ownership for photos directory
+          # Set immich ownership for photos directory with GROUP READ access (750)
           chown -R immich:immich /data/photos 2>/dev/null || true
-          chmod -R 755 /data/photos 2>/dev/null || true
+          chmod 750 /data/photos 2>/dev/null || true
+          find /data/photos -type d -exec chmod 750 {} \; 2>/dev/null || true
+          find /data/photos -type f -exec chmod 640 {} \; 2>/dev/null || true
 
           # Set obsidian permissions for WebDAV access
-          # Make nginx the owner so it can create files and directories
           chown -R nginx:nginx /data/obsidian 2>/dev/null || true
           chmod -R 755 /data/obsidian 2>/dev/null || true
 
-          # Also give nixos user access via group permissions
+          # Also give nixos user access via ACLs as backup
           ${pkgs.acl}/bin/setfacl -R -m u:nixos:rwx /data/obsidian 2>/dev/null || true
           ${pkgs.acl}/bin/setfacl -R -d -m u:nixos:rwx /data/obsidian 2>/dev/null || true
           ${pkgs.acl}/bin/setfacl -R -d -m u:nginx:rwx /data/obsidian 2>/dev/null || true

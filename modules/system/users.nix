@@ -46,6 +46,8 @@ in {
         extraGroups = [
           "wheel"
           "networkmanager"
+          "immich"
+          "media"
         ];
         shell = pkgs.zsh;
         openssh.authorizedKeys.keys = envVars.sshKeys;
