@@ -12,17 +12,12 @@
 in {
   virtualisation.podman.enable = true;
 
-  # REQUIRED: Manual user creation for container UID/GID mapping
-  # Cannot use automatic system due to container PUID/PGID requirements
   users.users.${qbtUser} = {
     isSystemUser = true;
     group = qbtGroup;
     home = "/var/lib/${qbtUser}";
     createHome = true;
     extraGroups = ["media"];
-  };
-
-  users.groups.${qbtGroup} = {
   };
 
   systemd = {
@@ -165,8 +160,8 @@ in {
         QBT_LEGAL_NOTICE = "confirm";
         QBT_VERSION = "latest";
         QBT_WEBUI_PORT = toString serviceConfig.port;
-        PUID = "1000";
-        PGID = "1000";
+        PUID = "988";
+        PGID = "983";
         TZ = config.time.timeZone;
       };
     };
