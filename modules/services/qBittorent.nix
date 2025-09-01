@@ -2,16 +2,14 @@
   config,
   pkgs,
   ...
-}:
-let
+}: let
   constants = import ../../constants.nix;
   envVars = import ../../envVars.nix;
   serviceConfig = constants.services.qbittorrent;
 
   qbtUser = "qbittorrent";
   qbtGroup = "qbittorrent";
-in
-{
+in {
   virtualisation.podman.enable = true;
 
   users.users.${qbtUser} = {
@@ -19,7 +17,7 @@ in
     group = qbtGroup;
     home = "/var/lib/${qbtUser}";
     createHome = true;
-    extraGroups = [ "media" ];
+    extraGroups = ["media"];
   };
 
   systemd = {
@@ -28,6 +26,9 @@ in
       "d /var/lib/${qbtUser} 0755 ${qbtUser} ${qbtGroup} -"
       "d /var/lib/${qbtUser}/qBittorrent 0755 ${qbtUser} ${qbtGroup} -"
       "d /var/lib/${qbtUser}/qBittorrent/config 0755 ${qbtUser} ${qbtGroup} -"
+
+      "Z /data/torrents 0775 ${qbtUser} media -"
+      "Z /data/media 0775 root media -"
     ];
 
     services.qbittorrent-health-check = {
@@ -76,7 +77,7 @@ in
 
     timers.qbittorrent-health-check = {
       description = "Periodic health check for qBittorrent stack";
-      wantedBy = [ "timers.target" ];
+      wantedBy = ["timers.target"];
       timerConfig = {
         OnBootSec = "10min";
         OnUnitActiveSec = "30min";
@@ -93,7 +94,7 @@ in
         "--cap-add=NET_ADMIN"
         "--device=/dev/net/tun:/dev/net/tun"
       ];
-      volumes = [ "/var/lib/gluetun:/gluetun" ];
+      volumes = ["/var/lib/gluetun:/gluetun"];
 
       environment = {
         VPN_SERVICE_PROVIDER = "protonvpn";
@@ -150,15 +151,15 @@ in
     qbittorrent-nox = {
       image = "qbittorrentofficial/qbittorrent-nox:latest";
       autoStart = true;
-      dependsOn = [ "gluetun" ];
+      dependsOn = ["gluetun"];
       extraOptions = [
         "--network=container:gluetun"
         "--group-add=980"
       ];
       volumes = [
         "/var/lib/${qbtUser}:/config"
-        "/data/torrents:/downloads"
-        "/data/media:/media"
+        "/data/torrents:/data/torrents"
+        "/data/media:/data/media"
       ];
       environment = {
         QBT_LEGAL_NOTICE = "confirm";
