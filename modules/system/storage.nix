@@ -61,6 +61,19 @@ in {
       ];
       depends = ["/data"];
     };
+
+    "/data/music" = {
+      device = "/dev/disk/by-label/data";
+      fsType = "btrfs";
+      options = [
+        "compress=zstd:3"
+        "space_cache=v2"
+        "autodefrag"
+        "noatime"
+        "subvol=music"
+      ];
+      depends = ["/data"];
+    };
   };
 
   systemd = {
@@ -83,6 +96,9 @@ in {
 
       # Obsidian directory (for nginx)
       "d /data/obsidian 0775 nginx nginx -"
+
+      # Music directory for audio group (MPD, snapcast, etc.)
+      "d /data/music 2775 root audio -"
     ];
 
     services = {
@@ -100,6 +116,7 @@ in {
           ln -sfn /data/media /media
           ln -sfn /data/photos /photos
           ln -sfn /data/obsidian /obsidian
+          ln -sfn /data/music /music
 
           # Media directories: root:media with SGID for new files to inherit group
           chown -R root:${constants.mediaGroup.name} /data/media /data/torrents 2>/dev/null || true
@@ -123,6 +140,12 @@ in {
           chown -R nginx:nginx /data/obsidian 2>/dev/null || true
           chmod -R 755 /data/obsidian 2>/dev/null || true
 
+          # Set music directory permissions for audio group
+          chown -R root:audio /data/music 2>/dev/null || true
+          chmod -R g+w /data/music 2>/dev/null || true
+          find /data/music -type d -exec chmod 2775 {} \; 2>/dev/null || true
+          find /data/music -type f -exec chmod 664 {} \; 2>/dev/null || true
+
           # Give nixos user access via ACLs as backup
           ${pkgs.acl}/bin/setfacl -R -m u:nixos:rwx /data/obsidian 2>/dev/null || true
           ${pkgs.acl}/bin/setfacl -R -d -m u:nixos:rwx /data/obsidian 2>/dev/null || true
@@ -131,6 +154,9 @@ in {
           # Set default ACLs for media group on media directories
           ${pkgs.acl}/bin/setfacl -R -d -m g:${constants.mediaGroup.name}:rwx /data/media 2>/dev/null || true
           ${pkgs.acl}/bin/setfacl -R -d -m g:${constants.mediaGroup.name}:rwx /data/torrents 2>/dev/null || true
+
+          # Set default ACLs for audio group on music directory
+          ${pkgs.acl}/bin/setfacl -R -d -m g:audio:rwx /data/music 2>/dev/null || true
         '';
       };
 

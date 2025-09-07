@@ -11,7 +11,7 @@
   qbtGroup = "qbittorrent";
 in {
   virtualisation.podman.enable = true;
-
+ # run this sudo chmod -R 777 /data/torrents
   users.users.${qbtUser} = {
     isSystemUser = true;
     group = qbtGroup;
