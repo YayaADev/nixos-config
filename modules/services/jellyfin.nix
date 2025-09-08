@@ -18,7 +18,6 @@ in {
     ++ [
       # Additional jellyfin-specific directories
       "Z /var/cache/jellyfin 0755 jellyfin jellyfin -"
-      "Z /data/media 0755 jellyfin jellyfin -"
     ];
 
   environment.systemPackages = with pkgs; [
