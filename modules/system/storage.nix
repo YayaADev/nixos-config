@@ -1,4 +1,3 @@
-
 {pkgs, ...}: let
   constants = import ../../constants.nix;
 in {
@@ -7,7 +6,7 @@ in {
   environment.systemPackages = with pkgs; [
     btrfs-progs
     compsize
-    acl 
+    acl
   ];
 
   fileSystems = {
@@ -82,17 +81,9 @@ in {
 
       # Media directories with SGID bit (2775) for proper group inheritance
       "d /data/media 2775 root ${constants.mediaGroup.name} -"
-      "d /data/media/movies 2775 root ${constants.mediaGroup.name} -"
-      "d /data/media/movies-4k 2775 root ${constants.mediaGroup.name} -"
-      "d /data/media/tv 2775 root ${constants.mediaGroup.name} -"
-      "d /data/media/tv-4k 2775 root ${constants.mediaGroup.name} -"
 
       # Too much headache with permissions of qbit in podmnan, full access
       "d /data/torrents 0777 root root -"
-      "d /data/torrents/movies 0777 root root -"
-      "d /data/torrents/movies-4k 0777 root root -"
-      "d /data/torrents/tv 0777 root root -"
-      "d /data/torrents/tv-4k 0777 root root -"
 
       # Photos directory for immich
       "d /data/photos 0750 immich immich -"
@@ -125,24 +116,20 @@ in {
 
           chown -h nixos:users /home/nixos/data
 
-          # Set correct ownership and permissions for media directories
-          chown -R root:${constants.mediaGroup.name} /data/media /data/torrents 2>/dev/null || true
+          # Set correct ownership and permissions for media directories to media group
+          chown -R root:${constants.mediaGroup.name} /data/media  2>/dev/null || true
 
           # Set SGID on directories (2775) - new files inherit group
           find /data/media -type d -exec chmod 2775 {} \; 2>/dev/null || true
-          find /data/torrents -type d -exec chmod 2775 {} \; 2>/dev/null || true
 
           # Set file permissions (664) - group writable
           find /data/media -type f -exec chmod 664 {} \; 2>/dev/null || true
-          find /data/torrents -type f -exec chmod 664 {} \; 2>/dev/null || true
 
           # Set default ACLs for media group inheritance
           ${pkgs.acl}/bin/setfacl -R -d -m g:${constants.mediaGroup.name}:rwx /data/media 2>/dev/null || true
-          ${pkgs.acl}/bin/setfacl -R -d -m g:${constants.mediaGroup.name}:rwx /data/torrents 2>/dev/null || true
 
           # Give existing media group members access
           ${pkgs.acl}/bin/setfacl -R -m g:${constants.mediaGroup.name}:rwx /data/media 2>/dev/null || true
-          ${pkgs.acl}/bin/setfacl -R -m g:${constants.mediaGroup.name}:rwx /data/torrents 2>/dev/null || true
 
           # Set immich permissions (photos)
           chown -R immich:immich /data/photos 2>/dev/null || true

@@ -12,7 +12,6 @@ in {
     group = "jellyfin";
   };
 
-  # Automatically create necessary directories with proper permissions
   systemd.tmpfiles.rules =
     serviceHelpers.createServiceDirectories "jellyfin" serviceConfig
     ++ [
