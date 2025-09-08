@@ -57,9 +57,9 @@
       glog = "git log --oneline --graph --decorate";
 
       # Storage
-      btrfs-usage = "btrfs filesystem usage /data";
-      btrfs-show = "btrfs filesystem show";
-      btrfs-subvols = "btrfs subvolume list /data";
+      btrfs-usage = "sudo btrfs filesystem usage /data";
+      btrfs-show = "sudo btrfs filesystem show";
+      btrfs-subvols = "sudo btrfs subvolume list /data";
       btrfs-scrub-status = "btrfs scrub status /data";
       btrfs-balance-status = "btrfs balance status /data";
       storage-info = "df -h /data && echo && btrfs filesystem usage /data";
