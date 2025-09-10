@@ -47,7 +47,7 @@ let
         "video"
         "render"
         "users"
-        "media" # Added media group
+        "media"
       ];
     };
     jellyseerr = {
@@ -85,6 +85,18 @@ let
       ];
       createHome = true;
       homeDir = "/var/lib/radarr";
+    };
+    readarr = {
+      port = 8787;
+      hostname = "readarr.home";
+      description = lib.mkForce "Readarr Book Management";
+      systemUser = true;
+      extraGroups = [
+        "users"
+        "media"
+      ];
+      createHome = true;
+      homeDir = "/var/lib/readarr";
     };
     prowlarr = {
       port = 9696;
