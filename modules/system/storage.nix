@@ -60,19 +60,6 @@ in {
       ];
       depends = ["/data"];
     };
-
-    "/data/music" = {
-      device = "/dev/disk/by-label/data";
-      fsType = "btrfs";
-      options = [
-        "compress=zstd:3"
-        "space_cache=v2"
-        "autodefrag"
-        "noatime"
-        "subvol=music"
-      ];
-      depends = ["/data"];
-    };
   };
 
   systemd = {
@@ -90,9 +77,6 @@ in {
 
       # Obsidian directory for WebDAV
       "d /data/obsidian 0775 nginx nginx -"
-
-      # Music directory for audio group (MPD, snapcast, etc.)
-      "d /data/music 2775 root audio -"
     ];
 
     services = {
@@ -110,7 +94,7 @@ in {
           ln -sfn /data/media/tv /tv
           ln -sfn /data/media /media
           ln -sfn /data/photos /photos
-          ln -sfn /data/music /music
+          ln -sfn /data/media/books /books
           ln -sfn /data/obsidian /obsidian
           ln -sfn /data /home/nixos/data
 
