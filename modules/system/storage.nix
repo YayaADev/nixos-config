@@ -95,6 +95,7 @@ in {
           ln -sfn /data/media /media
           ln -sfn /data/photos /photos
           ln -sfn /data/media/books /books
+          ln -sfn /data/media/audiobooks /audiobooks
           ln -sfn /data/obsidian /obsidian
           ln -sfn /data /home/nixos/data
 

@@ -98,6 +98,19 @@ let
       createHome = true;
       homeDir = "/var/lib/readarr";
     };
+
+    audiobookshelf = {
+      port = 13378;
+      hostname = "audiobookshelf.home";
+      description = lib.mkForce "Book viewing tool";
+      systemUser = true;
+      extraGroups = [
+        "users"
+        "media"
+      ];
+      createHome = true;
+      homeDir = "/var/lib/audiobookshelf";
+    };
     prowlarr = {
       port = 9696;
       hostname = "prowlarr.home";
