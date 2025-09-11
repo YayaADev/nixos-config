@@ -90,13 +90,13 @@ in {
         };
         script = ''
           # Create symlinks
-          ln -sfn /data/media/movies /movies
-          ln -sfn /data/media/tv /tv
-          ln -sfn /data/media /media
-          ln -sfn /data/photos /photos
-          ln -sfn /data/media/books /books
-          ln -sfn /data/media/audiobooks /audiobooks
-          ln -sfn /data/obsidian /obsidian
+          ln -sfn /data/media/movies /home/nixos/movies
+          ln -sfn /data/media/tv /home/nixos/tv
+          ln -sfn /data/media /home/nixos/media
+          ln -sfn /data/photos /home/nixos/photos
+          ln -sfn /data/media/books /home/nixos/books
+          ln -sfn /data/media/audiobooks /home/nixos/audiobooks
+          ln -sfn /data/obsidian /home/nixos/obsidian
           ln -sfn /data /home/nixos/data
 
           chown -h nixos:users /home/nixos/data
