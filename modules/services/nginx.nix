@@ -1,12 +1,9 @@
 # Wiki https://nixos.wiki/wiki/Nginx
 {
-  serviceHelpers,
   pkgs,
   lib,
   ...
-}: let
-  constants = import ../../constants.nix;
-in {
+}: {
   services.nginx = {
     enable = true;
 

@@ -111,6 +111,13 @@ let
       createHome = true;
       homeDir = "/var/lib/audiobookshelf";
     };
+
+    lazylibrarian = {
+      port = 5299;
+      hostname = "lazylibrarian.home";
+      description = "LazyLibrarian Book Management";
+      systemUser = false; # Using container with custom user management
+    };
     prowlarr = {
       port = 9696;
       hostname = "prowlarr.home";

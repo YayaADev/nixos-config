@@ -11,6 +11,12 @@
     lib.optionalAttrs (serviceConfig ? hostname) {
       ${serviceConfig.hostname} = {
         serverName = serviceConfig.hostname;
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 80;
+          }
+        ];
         locations."/" = {
           proxyPass = "http://${staticIP}:${toString serviceConfig.port}";
           proxyWebsockets = true;
