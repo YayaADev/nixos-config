@@ -21,10 +21,10 @@ in {
 
   systemd = {
     tmpfiles.rules = [
-      "d /var/lib/gluetun 0755 root root -"
-      "d /var/lib/${qbtUser} 0755 ${qbtUser} ${qbtGroup} -"
-      "d /var/lib/${qbtUser}/qBittorrent 0755 ${qbtUser} ${qbtGroup} -"
-      "d /var/lib/${qbtUser}/qBittorrent/config 0755 ${qbtUser} ${qbtGroup} -"
+      "d /var/lib/gluetun 0750 root root -"
+      "d /var/lib/${qbtUser} 0750 ${qbtUser} ${qbtGroup} -"
+      "d /var/lib/${qbtUser}/qBittorrent 0750 ${qbtUser} ${qbtGroup} -"
+      "d /var/lib/${qbtUser}/qBittorrent/config 0750 ${qbtUser} ${qbtGroup} -"
 
       "Z /data/torrents 0775 ${qbtUser} media -"
       "Z /data/media 0775 root media -"
