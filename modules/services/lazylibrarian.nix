@@ -22,6 +22,7 @@ in {
   virtualisation.oci-containers.containers.lazylibrarian = {
     image = "lscr.io/linuxserver/lazylibrarian:latest";
     autoStart = true;
+    dependsOn = ["gluetun"];
 
     environment = {
       PUID = "1000"; # using nixos user because permissions r hard
@@ -36,12 +37,8 @@ in {
       "/data/torrents/books:/downloads"
     ];
 
-    # Port mappings
-    ports = [
-      "${toString serviceConfig.port}:5299"
-    ];
-
     extraOptions = [
+      "--network=container:gluetun"
       "--label=io.containers.autoupdate=registry"
     ];
   };
