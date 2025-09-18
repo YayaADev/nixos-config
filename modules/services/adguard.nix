@@ -35,6 +35,7 @@ in {
         protection_enabled = true;
         filtering_enabled = true;
         safebrowsing_enabled = true;
+        filters_update_interval = 24;
 
         # Auto-generate DNS rewrites for services with hostnames
         rewrites =
@@ -67,6 +68,21 @@ in {
           enabled = true;
           url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_9.txt";
           name = "Malware Blocklist";
+        }
+        {
+          enabled = true;
+          url = "https://raw.githubusercontent.com/badmojr/1Hosts/master/Lite/adblock.txt";
+          name = "1Hosts (Lite)";
+        }
+        {
+          enabled = true;
+          url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/multi.txt";
+          name = "Hagezi Personal DNS Blocklist";
+        }
+        {
+          enabled = true;
+          url = "https://easylist.to/easylist/easyprivacy.txt";
+          name = "EasyPrivacy";
         }
       ];
 
