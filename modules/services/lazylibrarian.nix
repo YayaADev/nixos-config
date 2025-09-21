@@ -28,6 +28,7 @@ in {
       PUID = "1000"; # using nixos user because permissions r hard
       PGID = "980";
       TZ = config.time.timeZone;
+      DOCKER_MODS = "linuxserver/mods:universal-calibre";
     };
 
     # Volume mounts
