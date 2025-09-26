@@ -1,6 +1,9 @@
 # Adguard wiki https://wiki.nixos.org/wiki/Adguard_Home
-{lib, ...}: let
-  constants = import ../../constants.nix;
+{
+  lib,
+  constants,
+  ...
+}: let
   serviceConfig = constants.services.adguard;
 in {
   services.adguardhome = {

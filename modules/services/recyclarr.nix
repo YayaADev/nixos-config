@@ -1,6 +1,8 @@
-{pkgs, ...}: let
-  envVars = import ../../envVars.nix;
-in {
+{
+  pkgs,
+  envVars,
+  ...
+}: {
   services.recyclarr = {
     enable = true;
     user = "recyclarr";

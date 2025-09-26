@@ -1,6 +1,8 @@
-{pkgs, ...}: let
-  constants = import ../../constants.nix;
-in {
+{
+  constants,
+  pkgs,
+  ...
+}: {
   networking = {
     hostName = "nixos-cm3588";
     useNetworkd = true;
@@ -8,12 +10,11 @@ in {
 
     nameservers = [
       constants.network.staticIP
-      "9.9.9.9" # Quad9
-      "1.1.1.1" # Cloudflare
+      "9.9.9.9"
+      "1.1.1.1"
     ];
   };
 
-  # Open firewall for all service ports
   networking.firewall = {
     allowedTCPPorts = constants.allTcpPorts;
   };

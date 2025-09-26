@@ -1,7 +1,9 @@
-{config, ...}: let
-  constants = import ../../constants.nix;
-  envVars = import ../../envVars.nix;
-in {
+{
+  config,
+  constants,
+  envVars,
+  ...
+}: {
   services.cloudflared = {
     enable = true;
 

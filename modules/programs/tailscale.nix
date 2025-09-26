@@ -1,10 +1,9 @@
 {
   config,
   pkgs,
+  constants,
   ...
-}: let
-  constants = import ../../constants.nix;
-in {
+}: {
   services.tailscale = {
     enable = true;
     useRoutingFeatures = "both";

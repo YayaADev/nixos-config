@@ -2,9 +2,9 @@
 {
   config,
   pkgs,
+  constants,
   ...
 }: let
-  constants = import ../../constants.nix;
   serviceConfig = constants.services.lazylibrarian;
 
   llUser = "lazylibrarian";

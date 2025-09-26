@@ -1,5 +1,8 @@
-{serviceHelpers, ...}: let
-  constants = import ../../constants.nix;
+{
+  serviceHelpers,
+  constants,
+  ...
+}: let
   serviceConfig = constants.services.flaresolverr;
 in {
   services.flaresolverr = {

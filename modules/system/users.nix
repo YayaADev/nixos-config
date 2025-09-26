@@ -1,11 +1,10 @@
 {
   pkgs,
   lib,
+  envVars,
+  constants,
   ...
 }: let
-  envVars = import ../../envVars.nix;
-  constants = import ../../constants.nix;
-
   # Function to create a system user for a service
   createUserForSystemService = serviceName: serviceConfig: {
     users.${serviceName} =

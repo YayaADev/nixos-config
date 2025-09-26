@@ -1,9 +1,9 @@
 {
   pkgs,
   serviceHelpers,
+  constants,
   ...
 }: let
-  constants = import ../../constants.nix;
   serviceConfig = constants.services.jellyfin;
 in {
   services.jellyfin = {
@@ -15,7 +15,6 @@ in {
   systemd.tmpfiles.rules =
     serviceHelpers.createServiceDirectories "jellyfin" serviceConfig
     ++ [
-      # Additional jellyfin-specific directories
       "Z /var/cache/jellyfin 0755 jellyfin jellyfin -"
     ];
 

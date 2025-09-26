@@ -1,7 +1,29 @@
-{pkgs, ...}: {
-  networking.hostName = "nixos-cm3588";
-  time.timeZone = "America/Los_Angeles";
+{
+  pkgs,
+  inputs,
+  ...
+}: {
+  nix = {
+    settings = {
+      experimental-features = ["nix-command" "flakes"];
+    };
 
+    gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 30d";
+    };
+  };
+
+  # Nightly flake update
+  system.autoUpgrade = {
+    enable = true;
+    flake = inputs.self.outPath;
+    dates = "04:00";
+    allowReboot = false;
+  };
+
+  # Helpful CLI tools
   environment.systemPackages = with pkgs; [
     vim
     wget
@@ -29,13 +51,4 @@
     strace
     niv
   ];
-
-  nix = {
-    settings.experimental-features = ["nix-command" "flakes"];
-    gc = {
-      automatic = true;
-      dates = "weekly";
-      options = "--delete-older-than 30d";
-    };
-  };
 }

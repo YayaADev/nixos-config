@@ -1,6 +1,8 @@
-{pkgs, ...}: let
-  constants = import ../../constants.nix;
-in {
+{
+  pkgs,
+  constants,
+  ...
+}: {
   boot.supportedFilesystems = ["btrfs"];
 
   environment.systemPackages = with pkgs; [

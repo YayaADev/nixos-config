@@ -1,9 +1,12 @@
-let
-  secrets = import ./envVars.nix;
-  lib = import <nixpkgs/lib>;
+{
+  envVars,
+  pkgs,
+  ...
+}: let
+  secrets = envVars;
+  inherit (pkgs) lib;
 
   services = {
-    # Infrastructure services
     adguard = {
       port = 3000;
       hostname = "adguard.home";
@@ -21,23 +24,18 @@ let
       systemUser = true;
       extraGroups = [];
     };
-
-    # WebDAV service for Obsidian sync
     webdav = {
       port = 8080;
       hostname = "webdav.home";
       description = "WebDAV Server for Obsidian";
-      systemUser = false; # Uses nginx user
+      systemUser = false;
     };
-
     immich = {
       port = 3001;
       hostname = "immich.home";
       description = "Immich Photo Management";
       systemUser = false;
     };
-
-    # Media services
     jellyfin = {
       port = 8096;
       hostname = "jellyfin.home";
@@ -98,12 +96,11 @@ let
       createHome = true;
       homeDir = "/var/lib/audiobookshelf";
     };
-
     lazylibrarian = {
       port = 5299;
       hostname = "lazylibrarian.home";
       description = "LazyLibrarian Book Management";
-      systemUser = false; # Using container with custom user management
+      systemUser = false;
     };
     prowlarr = {
       port = 9696;
@@ -131,7 +128,6 @@ let
       description = "FlareSolverr CloudFlare Solver";
       systemUser = true;
     };
-
     qbittorrent = {
       port = 8090;
       hostname = "qbittorrent.home";
@@ -144,7 +140,6 @@ let
       createHome = true;
       homeDir = "/var/lib/qbittorrent";
     };
-
     grafana = {
       port = 3002;
       hostname = "grafana.home";
@@ -159,12 +154,10 @@ let
     };
   };
 
-  # Media group configuration
   mediaGroup = {
     name = "media";
   };
 
-  # Helper function to create system user configuration
   createUserForSystemService = serviceName: serviceConfig:
     lib.optionalAttrs (serviceConfig.systemUser or false) {
       users.${serviceName} =
@@ -189,24 +182,17 @@ in {
     inherit (secrets) subnet;
   };
 
-  # Services configuration
   inherit services;
 
-  # Media group configuration
   inherit mediaGroup;
 
-  # Helper functions to extract data
   ports = lib.mapAttrs (_name: service: service.port) services;
 
-  # Services that have hostnames (for nginx virtual hosts)
   nginxServices = lib.filterAttrs (_name: service: service ? hostname) services;
 
-  # Services that need system users
   systemServices = lib.filterAttrs (_name: service: service.systemUser or false) services;
 
-  # All TCP ports that need to be opened in firewall
   allTcpPorts = lib.attrValues (lib.mapAttrs (_name: service: service.port) services);
 
-  # Function to create users for system services
   inherit createUserForSystemService;
 }

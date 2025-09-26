@@ -1,9 +1,9 @@
 {
   lib,
   serviceHelpers,
+  constants,
   ...
 }: let
-  constants = import ../../constants.nix;
   serviceConfig = constants.services.immich;
 in {
   services.immich = {

@@ -3,9 +3,9 @@
   config,
   lib,
   pkgs,
+  constants,
   ...
 }: let
-  constants = import ../../constants.nix;
   grafanaConfig = constants.services.grafana;
   prometheusConfig = constants.services.prometheus;
 in {

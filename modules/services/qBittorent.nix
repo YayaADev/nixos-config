@@ -1,10 +1,10 @@
 {
   config,
   pkgs,
+  constants,
+  envVars,
   ...
 }: let
-  constants = import ../../constants.nix;
-  envVars = import ../../envVars.nix;
   serviceConfig = constants.services.qbittorrent;
 
   qbtUser = "qbittorrent";

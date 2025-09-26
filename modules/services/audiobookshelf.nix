@@ -1,5 +1,4 @@
-_: let
-  constants = import ../../constants.nix;
+{constants, ...}: let
   serviceConfig = constants.services.audiobookshelf;
 in {
   services.audiobookshelf = {

@@ -3,10 +3,9 @@
   serviceHelpers,
   pkgs,
   lib,
+  constants,
   ...
-}: let
-  constants = import ../../constants.nix;
-in {
+}: {
   services.nginx = {
     enable = true;
 
