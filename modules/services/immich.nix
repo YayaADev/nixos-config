@@ -17,7 +17,7 @@ in {
         crf = 23;
         threads = 0; # Use all available threads
         preset = "ultrafast"; # Encoding speed preset
-        accel = "vaapi"; # Hardware acceleration for RK3588
+        accel = "rkmpp"; # Hardware acceleration for RK3588
         accelDecode = true; # Hardware decode
         targetVideoCodec = "h264"; # Most compatible codec
         acceptedVideoCodecs = [
@@ -84,7 +84,7 @@ in {
 
       storageTemplate = {
         enabled = true;
-        template = "{{y}}/{{MM}}/{{filename}}"; # Simpler template
+        template = "{{y}}/{{MM}}/{{filename}}";
       };
 
       machineLearning = {
