@@ -34,7 +34,6 @@
       # Cleanup, search
       nix-gc = "sudo nix-collect-garbage -d";
       nix-search = "nix search nixpkgs";
-      nix-shell = "nix shell nixpkgs#bashInteractive -c zsh";
 
       ll = "eza -la";
       la = "eza -a";
