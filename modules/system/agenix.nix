@@ -1,6 +1,5 @@
 # modules/system/agenix.nix
-{ lib, inputs, ... }:
-let
+{...}: let
   secretsDir = "/home/nixos/nixos-config/secrets"; # not nix friendly cuz its hard coded to my path, nix wants me to do smth with flakes
 in {
   age.secrets = {

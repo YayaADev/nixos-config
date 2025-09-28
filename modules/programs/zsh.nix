@@ -21,15 +21,19 @@
     # shellAliases
     shellAliases = {
       # NixOS specific
-      rebuild = "sudo nixos-rebuild switch";
-      rebuild-test = "sudo nixos-rebuild test";
-      rebuild-boot = "sudo nixos-rebuild boot";
-      rebuild-dry = "sudo nixos-rebuild dry-build";
+      rebuild = "sudo nixos-rebuild switch --flake /home/nixos/nixos-config --impure";
+      rebuild-test = "sudo nixos-rebuild test --flake /home/nixos/nixos-config --impure";
+      rebuild-boot = "sudo nixos-rebuild boot --flake /home/nixos/nixos-config --impure";
+      rebuild-dry = "nixos-rebuild build --flake /home/nixos/nixos-config --dry-run --impure";
+
+      flake-update = "cd /home/nixos/nixos-config && nix flake update";
+      flake-check = "cd /home/nixos/nixos-config && nix flake check --keep-going --impure";
       rollback = "sudo nixos-rebuild switch --rollback";
+
+      # Cleanup, search
+      nix-gc = "sudo nix-collect-garbage -d";
       nix-search = "nix search nixpkgs";
-      nix-shell = "nix-shell --run zsh";
-      nixos-config = "sudo nano /etc/nixos/configuration.nix";
-      nixos-hardware = "sudo nano /etc/nixos/hardware-configuration.nix";
+      nix-shell = "nix shell nixpkgs#bashInteractive -c zsh";
 
       ll = "eza -la";
       la = "eza -a";

@@ -2,11 +2,8 @@
 {
   config,
   pkgs,
-  constants,
   ...
 }: let
-  serviceConfig = constants.services.lazylibrarian;
-
   llUser = "lazylibrarian";
   llGroup = "lazylibrarian";
 in {
