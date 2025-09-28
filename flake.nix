@@ -29,5 +29,14 @@
         agenix.nixosModules.age
       ];
     };
+
+    formatter.${system} = pkgs.nixfmt-rfc-style;
+
+    # === Linting check (for `nix flake check`) ===
+    checks.${system}.lint = pkgs.runCommand "lint" {} ''
+      ${pkgs.statix}/bin/statix check .
+      ${pkgs.deadnix}/bin/deadnix --quiet .
+      touch $out
+    '';
   };
 }

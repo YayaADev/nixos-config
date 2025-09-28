@@ -1,6 +1,6 @@
 # Build results
 result*
-
+secrets
 # Secrets and authentication
 *.age
 envVars.nix

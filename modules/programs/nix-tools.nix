@@ -1,17 +1,15 @@
+# modules/programs/nix-tools.nix
+{ lib, pkgs, ... }:
 {
-  lib,
-  pkgs,
-  ...
-}: {
   # Install Nix development tools system-wide
   environment.systemPackages = with pkgs; [
-    # Language servers
+    # Language server
     nixd
 
-    # Formatters & linters
-    alejandra
-    statix
-    deadnix
+    # Formatters & linters (up-to-date standard)
+    nixfmt-rfc-style # official RFC-style formatter
+    statix # linter
+    deadnix # dead code detector
 
     # Nix utilities
     nixpkgs-review
@@ -34,6 +32,6 @@
     zsh.enable = true;
   };
 
-  # Make Alejandra the default formatter for nix-ide
-  environment.variables.NIX_FORMATTER = "alejandra";
+  # Use nixfmt as the default formatter for Nix IDEs
+  environment.variables.NIX_FORMATTER = "nixfmt";
 }
