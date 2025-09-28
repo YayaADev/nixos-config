@@ -17,7 +17,7 @@
   }: let
     system = "aarch64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
-    envVars = import ./envVars.nix;
+    envVars = import /home/nixos/nixos-config/envVars.nix; # nix requires all ur files in git. i dont want this in git, its kinda a hassle for some home server
     constants = import ./constants.nix {inherit inputs self envVars pkgs;};
   in {
     nixosConfigurations.nixos-cm3588 = nixpkgs.lib.nixosSystem {
