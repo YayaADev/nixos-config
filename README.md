@@ -4,7 +4,7 @@ My NixOS configuration for a home server running on FriendlyElec CM3588+ SBC.
 
 ## Overview
 
-Some services online
+Some services online (when they work)
 - **Media Management**: Complete *arr stack + Jellyfin
 - **Network Services**: DNS filtering, reverse proxy
 - **Monitoring**: Grafana + Prometheus dashboards (i dont actually use this)
