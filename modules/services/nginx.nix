@@ -8,6 +8,7 @@
 }: {
   services.nginx = {
     enable = true;
+    clientMaxBodySize = "50G";
 
     # WebDAV module support
     additionalModules = [pkgs.nginxModules.dav];
