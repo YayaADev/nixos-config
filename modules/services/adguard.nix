@@ -3,9 +3,11 @@
   lib,
   constants,
   ...
-}: let
+}:
+let
   serviceConfig = constants.services.adguard;
-in {
+in
+{
   services.adguardhome = {
     enable = true;
     mutableSettings = false;
@@ -16,7 +18,7 @@ in {
       };
       # DNS configuration
       dns = {
-        bind_hosts = ["0.0.0.0"];
+        bind_hosts = [ "0.0.0.0" ];
         port = 53; # Standard DNS port
         upstream_dns = [
           "9.9.9.9"
@@ -41,13 +43,10 @@ in {
         filters_update_interval = 24;
 
         # Auto-generate DNS rewrites for services with hostnames
-        rewrites =
-          lib.mapAttrsToList
-          (_name: service: {
-            domain = service.hostname;
-            answer = constants.network.staticIP;
-          })
-          constants.nginxServices;
+        rewrites = lib.mapAttrsToList (_name: service: {
+          domain = service.hostname;
+          answer = constants.network.staticIP;
+        }) constants.nginxServices;
       };
 
       # Filter lists
@@ -89,14 +88,24 @@ in {
         }
       ];
 
-      querylog.enabled = true;
-      statistics.enabled = true;
+      querylog = {
+        enabled = true;
+        interval = "24h"; 
+        size_memory = 1000; 
+        ignored = [ ];
+      };
+
+      statistics = {
+        enabled = true;
+        interval = "24h"; 
+        ignored = [ ];
+      };
     };
   };
 
   # Firewall
   networking.firewall = {
-    allowedTCPPorts = [53];
-    allowedUDPPorts = [53];
+    allowedTCPPorts = [ 53 ];
+    allowedUDPPorts = [ 53 ];
   };
 }

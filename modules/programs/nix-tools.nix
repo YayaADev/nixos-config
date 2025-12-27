@@ -1,15 +1,13 @@
-# modules/programs/nix-tools.nix
 { pkgs, ... }:
 {
   # Install Nix development tools system-wide
   environment.systemPackages = with pkgs; [
-    # Language server
     nixd
 
-    # Formatters & linters (up-to-date standard)
-    nixfmt-rfc-style # official RFC-style formatter
-    statix # linter
-    deadnix # dead code detector
+    # Formatters & linters
+    nixfmt-rfc-style 
+    statix # 
+    deadnix 
 
     # Nix utilities
     nixpkgs-review
@@ -18,7 +16,6 @@
     nix-update
   ];
 
-  # Recommended shell & dev tools
   programs = {
     nix-ld = {
       enable = true;
