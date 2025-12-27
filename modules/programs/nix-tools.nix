@@ -1,5 +1,5 @@
 # modules/programs/nix-tools.nix
-{ lib, pkgs, ... }:
+{ pkgs, ... }:
 {
   # Install Nix development tools system-wide
   environment.systemPackages = with pkgs; [

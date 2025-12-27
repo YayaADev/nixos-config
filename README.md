@@ -7,20 +7,18 @@ My NixOS configuration for a home server running on FriendlyElec CM3588+ SBC.
 Some services online (when they work)
 - **Media Management**: Complete *arr stack + Jellyfin
 - **Network Services**: DNS filtering, reverse proxy
-- **Monitoring**: Grafana + Prometheus dashboards (i dont actually use this)
+- **Monitoring**: None gl
 - **Storage**: Btrfs with compression. RAID1 setup across 3 drives
 - **Security**: Tailscale VPN, Cloudflare tunnels
 - **Development**: VS Code remote support, Nix development tools
 
 ## Services Overview
 
-### Core Infrastructure
+### Network Infrastructure
 | Service | Port | Internal URL | Purpose |
 |---------|------|--------------|---------|
 | **AdGuard Home** | 3000 | `adguard.home` | DNS filtering & ad blocking |
 | **Nginx** | 80 | - | Reverse proxy for all services |
-| **Grafana** | 3002 | `grafana.home` | System monitoring dashboards |
-| **Prometheus** | 9090 | `prometheus.home` | Metrics collection |
 
 ### Media Stack
 | Service | Port | Internal URL | Purpose |

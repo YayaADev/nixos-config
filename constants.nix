@@ -2,7 +2,8 @@
   envVars,
   pkgs,
   ...
-}: let
+}:
+let
   secrets = envVars;
   inherit (pkgs) lib;
 
@@ -22,7 +23,7 @@
       port = 7844;
       description = "Cloudflare Tunnel";
       systemUser = true;
-      extraGroups = [];
+      extraGroups = [ ];
     };
     webdav = {
       port = 8080;
@@ -140,17 +141,13 @@
       createHome = true;
       homeDir = "/var/lib/qbittorrent";
     };
-    grafana = {
-      port = 3002;
-      hostname = "grafana.home";
-      description = "Grafana Dashboard";
-      systemUser = false;
-    };
-    prometheus = {
-      port = 9090;
-      hostname = "prometheus.home";
-      description = "Prometheus Metrics";
-      systemUser = false;
+    languageTutor = {
+      port = 9091;
+      hostname = "tutor.home";
+      description = "AI Language Tutor";
+      systemUser = true;
+      createHome = true;
+      homeDir = "/var/lib/language-tutor";
     };
   };
 
@@ -158,23 +155,24 @@
     name = "media";
   };
 
-  createUserForSystemService = serviceName: serviceConfig:
+  createUserForSystemService =
+    serviceName: serviceConfig:
     lib.optionalAttrs (serviceConfig.systemUser or false) {
-      users.${serviceName} =
-        {
-          isSystemUser = true;
-          inherit (serviceConfig) description;
-          group = serviceName;
-          extraGroups = serviceConfig.extraGroups or [];
-        }
-        // lib.optionalAttrs (serviceConfig.createHome or false) {
-          home = lib.mkForce (serviceConfig.homeDir or "/var/lib/${serviceName}");
-          createHome = true;
-        };
+      users.${serviceName} = {
+        isSystemUser = true;
+        inherit (serviceConfig) description;
+        group = serviceName;
+        extraGroups = serviceConfig.extraGroups or [ ];
+      }
+      // lib.optionalAttrs (serviceConfig.createHome or false) {
+        home = lib.mkForce (serviceConfig.homeDir or "/var/lib/${serviceName}");
+        createHome = true;
+      };
 
-      groups.${serviceName} = {};
+      groups.${serviceName} = { };
     };
-in {
+in
+{
   network = {
     inherit (secrets) staticIP;
     inherit (secrets) gateway;
