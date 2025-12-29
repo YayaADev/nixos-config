@@ -54,6 +54,7 @@
 
   # Helpful CLI tools
   environment.systemPackages = with pkgs; [
+    tailscale
     vim
     wget
     curl

@@ -1,7 +1,9 @@
-{lib, ...}: let
+{ lib, ... }:
+let
   moduleFiles = lib.filesystem.listFilesRecursive ./modules;
   modules = builtins.filter (path: lib.hasSuffix ".nix" path) moduleFiles;
-in {
+in
+{
   imports = modules;
 
   time.timeZone = "America/Los_Angeles";
