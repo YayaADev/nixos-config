@@ -5,15 +5,15 @@
   lib,
   constants,
   ...
-}: {
+}:
+{
   services.nginx = {
     enable = true;
     clientMaxBodySize = "50G";
 
     # WebDAV module support
-    additionalModules = [pkgs.nginxModules.dav];
+    additionalModules = [ pkgs.nginxModules.dav ];
 
-    # Add WebDAV-specific configuration to the main nginx config
     appendHttpConfig = ''
       # WebDAV specific settings
       client_body_temp_path /tmp/nginx_webdav_temp;
@@ -81,5 +81,5 @@
   ];
 
   # Make sure nginx can read/write to obsidian directory
-  users.users.nginx.extraGroups = ["users"];
+  users.users.nginx.extraGroups = [ "users" ];
 }

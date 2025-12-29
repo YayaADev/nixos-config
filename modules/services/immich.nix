@@ -3,9 +3,11 @@
   serviceHelpers,
   constants,
   ...
-}: let
+}:
+let
   serviceConfig = constants.services.immich;
-in {
+in
+{
   services.immich = {
     enable = true;
     inherit (serviceConfig) port;
@@ -35,7 +37,7 @@ in {
           "mp4"
           "webm"
         ];
-        targetResolution = "720"; # String format, not "720p"
+        targetResolution = "original"; # String format, not "720p"
         maxBitrate = "0"; # No limit
         bframes = -1; # Auto
         refs = 0; # Auto
@@ -44,11 +46,10 @@ in {
         cqMode = "auto"; # Constant quality mode
         twoPass = false; # Single pass encoding
         preferredHwDevice = "auto"; # Auto hardware device selection
-        transcode = "required"; # Always transcode for compatibility
+        transcode = "optimal"; # The balance between storage and performance
         tonemap = "hable"; # HDR tone mapping
       };
 
-      # Job concurrency settings
       job = {
         backgroundTask = {
           concurrency = 5;
@@ -75,7 +76,7 @@ in {
           concurrency = 5;
         };
         thumbnailGeneration = {
-          concurrency = 3;
+          concurrency = 5;
         };
         videoConversion = {
           concurrency = 1;
@@ -153,26 +154,14 @@ in {
   };
 
   # Create necessary directories
-  systemd.tmpfiles.rules =
-    [
-      "d /data/photos 0755 immich immich -"
-      "d /data/photos/upload 0755 immich immich -"
-      "d /data/photos/library 0755 immich immich -"
-      "d /data/photos/thumbs 0755 immich immich -"
-      "d /data/photos/encoded-video 0755 immich immich -"
-    ]
-    ++ serviceHelpers.createServiceDirectories "immich" serviceConfig;
-
-  # Hardware acceleration support
-  hardware.graphics = {
-    enable = true;
-  };
-
-  # Kernel modules for RK3588 hardware acceleration
-  boot.kernelModules = [
-    "rockchip_rga"
-    "rockchip_vdec"
-  ];
+  systemd.tmpfiles.rules = [
+    "d /data/photos 0755 immich immich -"
+    "d /data/photos/upload 0755 immich immich -"
+    "d /data/photos/library 0755 immich immich -"
+    "d /data/photos/thumbs 0755 immich immich -"
+    "d /data/photos/encoded-video 0755 immich immich -"
+  ]
+  ++ serviceHelpers.createServiceDirectories "immich" serviceConfig;
 
   # Udev rules for hardware access
   services.udev.extraRules = ''

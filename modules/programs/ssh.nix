@@ -7,8 +7,16 @@ _: {
     };
   };
 
+  programs.ssh.extraConfig = ''
+    Host builder
+      HostName 192.168.1.XXX
+      User nixbuilder
+      IdentityFile /root/.ssh/nixbuilder
+      IdentitiesOnly yes
+  '';
+
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [22];
+    allowedTCPPorts = [ 22 ];
   };
 }

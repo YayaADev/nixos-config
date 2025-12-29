@@ -3,7 +3,8 @@
   pkgs,
   constants,
   ...
-}: {
+}:
+{
   services.tailscale = {
     enable = true;
     useRoutingFeatures = "both";
@@ -13,8 +14,8 @@
   networking = {
     firewall = {
       enable = true;
-      allowedUDPPorts = [config.services.tailscale.port];
-      trustedInterfaces = ["tailscale0"];
+      allowedUDPPorts = [ config.services.tailscale.port ];
+      trustedInterfaces = [ "tailscale0" ];
       checkReversePath = "loose";
     };
   };
@@ -34,7 +35,7 @@
       "network-pre.target"
       "tailscale.service"
     ];
-    wantedBy = ["multi-user.target"];
+    wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
       User = "root";

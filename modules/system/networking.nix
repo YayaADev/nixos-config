@@ -9,7 +9,7 @@
     interfaces.${constants.network.interface}.useDHCP = true;
 
     nameservers = [
-      constants.network.staticIP
+      "127.0.0.1"
       "9.9.9.9"
       "1.1.1.1"
     ];

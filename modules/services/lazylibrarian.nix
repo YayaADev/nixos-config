@@ -1,4 +1,3 @@
-# modules/services/lazylibrarian.nix
 {
   config,
   pkgs,

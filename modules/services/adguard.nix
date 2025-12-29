@@ -19,7 +19,7 @@ in
       # DNS configuration
       dns = {
         bind_hosts = [ "0.0.0.0" ];
-        port = 53; # Standard DNS port
+        port = 53;
         upstream_dns = [
           "9.9.9.9"
           "149.112.112.112"
@@ -90,14 +90,14 @@ in
 
       querylog = {
         enabled = true;
-        interval = "24h"; 
-        size_memory = 1000; 
+        interval = "24h";
+        size_memory = 1000;
         ignored = [ ];
       };
 
       statistics = {
         enabled = true;
-        interval = "24h"; 
+        interval = "24h";
         ignored = [ ];
       };
     };

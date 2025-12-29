@@ -6,7 +6,6 @@
     autosuggestions.enable = true;
     syntaxHighlighting.enable = true;
 
-    # ohMyZsh
     ohMyZsh = {
       enable = true;
       theme = "robbyrussell";
@@ -19,13 +18,17 @@
       ];
     };
 
-    # shellAliases
     shellAliases = {
       # NixOS specific
       rebuild = "sudo nixos-rebuild switch --flake /home/nixos/nixos-config --impure";
       rebuild-test = "sudo nixos-rebuild test --flake /home/nixos/nixos-config --impure";
       rebuild-boot = "sudo nixos-rebuild boot --flake /home/nixos/nixos-config --impure";
       rebuild-dry = "nixos-rebuild build --flake /home/nixos/nixos-config --dry-run --impure";
+
+      # NixOS - remote builds (on x86 Ryzen 9)
+      rebuild-remote = "sudo nixos-rebuild switch --flake /home/nixos/nixos-config --impure --max-jobs 0";
+      rebuild-remote-test = "sudo nixos-rebuild test --flake /home/nixos/nixos-config --impure --max-jobs 0";
+      rebuild-remote-boot = "sudo nixos-rebuild boot --flake /home/nixos/nixos-config --impure --max-jobs 0";
 
       flake-update = "cd /home/nixos/nixos-config && nix flake update";
       flake-check = "cd /home/nixos/nixos-config && nix flake check --keep-going --impure";
@@ -57,7 +60,7 @@
       mounted = "mount | column -t";
 
       # Git
-      gst = "git status";
+      gs = "git status";
       glog = "git log --oneline --graph --decorate";
 
       # Storage
