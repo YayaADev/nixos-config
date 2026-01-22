@@ -10,7 +10,7 @@ in
 {
   services.adguardhome = {
     enable = true;
-    mutableSettings = false;
+    mutableSettings = true;
     settings = {
       # Web interface
       http = {

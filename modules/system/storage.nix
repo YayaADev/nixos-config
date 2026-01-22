@@ -73,17 +73,9 @@
   systemd = {
     tmpfiles.rules = [
       "d /data 0755 root root -"
-
-      # Media directories with SGID bit (2775) for proper group inheritance
       "d /data/media 2775 root ${constants.mediaGroup.name} -"
-
-      # Too much headache with permissions of qbit in podmnan, full access
       "d /data/torrents 0777 root root -"
-
-      # Photos directory for immich
       "d /data/photos 0750 immich immich -"
-
-      # Obsidian directory for WebDAV
       "d /data/obsidian 0775 nginx nginx -"
     ];
 
@@ -97,7 +89,7 @@
           RemainAfterExit = true;
         };
         script = ''
-          # Create symlinks
+          # Symlinks (always)
           ln -sfn /data/media/movies /home/nixos/movies
           ln -sfn /data/media/tv /home/nixos/tv
           ln -sfn /data/media /home/nixos/media
@@ -106,36 +98,38 @@
           ln -sfn /data/media/audiobooks /home/nixos/audiobooks
           ln -sfn /data/obsidian /home/nixos/obsidian
           ln -sfn /data /home/nixos/data
-
           chown -h nixos:users /home/nixos/data
 
-          # Set correct ownership and permissions for media directories to media group
-          chown -R root:${constants.mediaGroup.name} /data/media  2>/dev/null || true
+          # Heavy operations - only run once (bump version to re-run)
+          MARKER="/data/.permissions_fixed_v1"
+          if [ -f "$MARKER" ]; then
+            echo "Permissions already set, skipping."
+            exit 0
+          fi
 
-          # Set SGID on directories (2775) - new files inherit group
-          find /data/media -type d -exec chmod 2775 {} \; 2>/dev/null || true
+          echo "Running full permission setup..."
 
-          # Set file permissions (664) - group writable
-          find /data/media -type f -exec chmod 664 {} \; 2>/dev/null || true
+          # Media
+          chown -R root:${constants.mediaGroup.name} /data/media
+          find /data/media -type d -exec chmod 2775 {} \;
+          find /data/media -type f -exec chmod 664 {} \;
+          ${pkgs.acl}/bin/setfacl -R -d -m g:${constants.mediaGroup.name}:rwx /data/media
+          ${pkgs.acl}/bin/setfacl -R -m g:${constants.mediaGroup.name}:rwx /data/media
 
-          # Set default ACLs for media group inheritance
-          ${pkgs.acl}/bin/setfacl -R -d -m g:${constants.mediaGroup.name}:rwx /data/media 2>/dev/null || true
+          # Photos
+          chown -R immich:immich /data/photos
+          find /data/photos -type d -exec chmod 750 {} \;
+          find /data/photos -type f -exec chmod 640 {} \;
 
-          # Give existing media group members access
-          ${pkgs.acl}/bin/setfacl -R -m g:${constants.mediaGroup.name}:rwx /data/media 2>/dev/null || true
+          # Obsidian
+          chown -R nginx:nginx /data/obsidian
+          chmod -R 755 /data/obsidian
+          ${pkgs.acl}/bin/setfacl -R -m u:nixos:rwx /data/obsidian
+          ${pkgs.acl}/bin/setfacl -R -d -m u:nixos:rwx /data/obsidian
+          ${pkgs.acl}/bin/setfacl -R -d -m u:nginx:rwx /data/obsidian
 
-          # Set immich permissions (photos)
-          chown -R immich:immich /data/photos 2>/dev/null || true
-          chmod 750 /data/photos 2>/dev/null || true
-          find /data/photos -type d -exec chmod 750 {} \; 2>/dev/null || true
-          find /data/photos -type f -exec chmod 640 {} \; 2>/dev/null || true
-
-          # Set obsidian permissions (WebDAV)
-          chown -R nginx:nginx /data/obsidian 2>/dev/null || true
-          chmod -R 755 /data/obsidian 2>/dev/null || true
-          ${pkgs.acl}/bin/setfacl -R -m u:nixos:rwx /data/obsidian 2>/dev/null || true
-          ${pkgs.acl}/bin/setfacl -R -d -m u:nixos:rwx /data/obsidian 2>/dev/null || true
-          ${pkgs.acl}/bin/setfacl -R -d -m u:nginx:rwx /data/obsidian 2>/dev/null || true
+          touch "$MARKER"
+          echo "Done."
         '';
       };
 

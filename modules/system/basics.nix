@@ -80,5 +80,6 @@
     file
     strace
     niv
+    tmux
   ];
 }

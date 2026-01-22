@@ -47,6 +47,8 @@ in {
           "networkmanager"
           "immich"
           "media"
+          "render"
+          "video"
         ];
         shell = pkgs.zsh;
         openssh.authorizedKeys.keys = envVars.sshKeys;
