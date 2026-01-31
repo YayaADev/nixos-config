@@ -69,7 +69,16 @@
       btrfs-subvols = "sudo btrfs subvolume list /data";
       btrfs-scrub-status = "btrfs scrub status /data";
       btrfs-balance-status = "btrfs balance status /data";
-      storage-info = "df -h /data && echo && btrfs filesystem usage /data";
+      storage-info = ''
+        echo "=== Disk Usage ==="
+        df -h / /boot /data 2>/dev/null
+        echo ""
+        echo "=== BTRFS Status ==="
+        sudo btrfs filesystem usage /data
+        echo ""
+        echo "=== Device Errors ==="
+        sudo btrfs device stats /data
+      '';
     };
 
     # shellInit

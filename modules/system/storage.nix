@@ -24,7 +24,6 @@
       options = [
         "compress=zstd:3"
         "space_cache=v2"
-        "autodefrag"
         "noatime"
         "subvol=/"
       ];
@@ -36,7 +35,6 @@
       options = [
         "compress=zstd:3"
         "space_cache=v2"
-        "autodefrag"
         "noatime"
         "subvol=media"
       ];
@@ -49,7 +47,6 @@
       options = [
         "compress=zstd:3"
         "space_cache=v2"
-        "autodefrag"
         "noatime"
         "subvol=photos"
       ];
@@ -62,7 +59,6 @@
       options = [
         "compress=zstd:3"
         "space_cache=v2"
-        "autodefrag"
         "noatime"
         "subvol=obsidian"
       ];
