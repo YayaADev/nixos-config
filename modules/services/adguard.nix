@@ -11,7 +11,6 @@ in
     enable = true;
     mutableSettings = true;
     settings = {
-      # Web interface
       http = {
         address = "0.0.0.0:${toString serviceConfig.port}";
         trusted_proxies = [
@@ -45,7 +44,6 @@ in
         safebrowsing_enabled = true;
         filters_update_interval = 24;
 
-        # All websites with home suffix gets rewritten
         rewrites = [
           {
             domain = "*.home";

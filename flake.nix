@@ -50,10 +50,10 @@
           };
         };
         modules = [
-          # Using OPi5+ CORE module for the vendor kernel NPU support. Same Soc as this
+          # Using OPi5+ CORE module for the vendor kernel NPU support. Same SOC as this
           nixos-rk3588.nixosModules.boards.orangepi5plus.core
 
-          # Override DTB for CM3588. idk why, claude said this tho
+          # Override DTB for CM3588. The CM3588 NAS wiring map is different than the orangepi5plus
           (
             { lib, ... }:
             {
@@ -66,6 +66,6 @@
           agenix.nixosModules.age
         ];
       };
-      formatter.${system} = pkgs.nixfmt-rfc-style;
+      formatter.${system} = pkgs.nixfmt;
     };
 }

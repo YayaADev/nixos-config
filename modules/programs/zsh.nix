@@ -67,8 +67,8 @@
       btrfs-usage = "sudo btrfs filesystem usage /data";
       btrfs-show = "sudo btrfs filesystem show";
       btrfs-subvols = "sudo btrfs subvolume list /data";
-      btrfs-scrub-status = "btrfs scrub status /data";
-      btrfs-balance-status = "btrfs balance status /data";
+      btrfs-scrub-status = "sudo btrfs scrub status /data";
+      btrfs-balance-status = "sudo btrfs balance status /data";
       storage-info = ''
         echo "=== Disk Usage ==="
         df -h / /boot /data 2>/dev/null

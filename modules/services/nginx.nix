@@ -1,4 +1,3 @@
-# Wiki https://nixos.wiki/wiki/Nginx
 {
   serviceHelpers,
   pkgs,
@@ -9,6 +8,9 @@
 {
   services.nginx = {
     enable = true;
+    recommendedProxySettings = true;
+    recommendedGzipSettings = true;
+    recommendedOptimisation = true;
     clientMaxBodySize = "50G";
 
     # WebDAV module support
@@ -18,6 +20,9 @@
       # Fix proxy_headers_hash warning
       proxy_headers_hash_max_size 1024;
       proxy_headers_hash_bucket_size 128;
+
+      # Prevents 400 Bad Request on Sonarr/Radarr/Jellyfin due to large cookies
+      large_client_header_buffers 4 16k;
 
       # WebDAV specific settings
       client_body_temp_path /tmp/nginx_webdav_temp;

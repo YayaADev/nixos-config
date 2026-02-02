@@ -37,7 +37,7 @@ in
           "mp4"
           "webm"
         ];
-        targetResolution = "original"; # String format, not "720p"
+        targetResolution = "original";
         maxBitrate = "0"; # No limit
         bframes = -1; # Auto
         refs = 0; # Auto

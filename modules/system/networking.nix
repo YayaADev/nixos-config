@@ -8,17 +8,16 @@
     hostName = "nixos-cm3588";
     useNetworkd = true;
     interfaces.${constants.network.interface}.useDHCP = true;
-    resolvconf.enable = false;
   };
 
-  # This bypasses network managers and forces the file to exist with these exact contents.
+  # This guarantees /etc/resolv.conf exists and points to AdGuard (localhost)
   environment.etc."resolv.conf".text = ''
     nameserver 127.0.0.1
     nameserver 9.9.9.9
     options edns0
   '';
 
-  # Tell networkd: use DHCP for IP only, ignore its DNS. it keep sgetting overritten its annoying
+  # Tell networkd: use DHCP for IP only, ignore the router's DNS (prevents overwrite)
   systemd.network.networks."10-${constants.network.interface}" = {
     matchConfig.Name = constants.network.interface;
     networkConfig.DHCP = "ipv4";

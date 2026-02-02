@@ -9,7 +9,6 @@
     group = "recyclarr";
     schedule = "weekly";
 
-    # Recyclarr v5+ configuration
     configuration = {
       radarr = {
         radarr_main = {
@@ -26,10 +25,56 @@
             {
               name = "HD Bluray + WEB";
               reset_unmatched_scores.enabled = true;
+              upgrade = {
+                allowed = true;
+                until_quality = "Bluray-1080p";
+                until_score = 10000;
+              };
+              qualities = [
+                {
+                  name = "Bluray-1080p";
+                  enabled = true;
+                }
+                {
+                  name = "WEBDL-1080p";
+                  enabled = true;
+                }
+                {
+                  name = "WEBRip-1080p";
+                  enabled = true;
+                }
+                {
+                  name = "Bluray-720p";
+                  enabled = true;
+                }
+              ];
             }
             {
               name = "UHD Bluray + WEB";
               reset_unmatched_scores.enabled = true;
+              upgrade = {
+                allowed = true;
+                until_quality = "Remux-2160p";
+                until_score = 10000;
+              };
+              qualities = [
+                {
+                  name = "Remux-2160p";
+                  enabled = true;
+                }
+                {
+                  name = "Bluray-2160p";
+                  enabled = true;
+                }
+                {
+                  name = "WEBDL-2160p";
+                  enabled = true;
+                }
+                {
+                  name = "Bluray-1080p";
+                  enabled = true;
+                }
+              ];
             }
           ];
         };
@@ -41,18 +86,11 @@
           api_key = envVars.sonarr.apiKey;
 
           include = [
-            # Quality definition — only one allowed per instance.
-            # "series" covers standard TV sizes. Anime sizes will be slightly off
-            # but it's fine in practice; avoids needing a second instance.
             { template = "sonarr-quality-definition-series"; }
-
-            # Standard TV profiles
             { template = "sonarr-v4-custom-formats-web-1080p"; }
             { template = "sonarr-v4-quality-profile-web-1080p"; }
             { template = "sonarr-v4-custom-formats-web-2160p"; }
             { template = "sonarr-v4-quality-profile-web-2160p"; }
-
-            # Anime profiles — pulls in all TRaSH release-group tiers
             { template = "sonarr-v4-custom-formats-anime"; }
             { template = "sonarr-v4-quality-profile-anime"; }
           ];
@@ -61,14 +99,71 @@
             {
               name = "WEB-1080p";
               reset_unmatched_scores.enabled = true;
+              upgrade = {
+                allowed = true;
+                until_quality = "WEBDL-1080p";
+                until_score = 10000;
+              };
+              qualities = [
+                {
+                  name = "WEBDL-1080p";
+                  enabled = true;
+                }
+                {
+                  name = "WEBRip-1080p";
+                  enabled = true;
+                }
+                {
+                  name = "HDTV-1080p";
+                  enabled = true;
+                }
+              ];
             }
             {
-              name = "WEB-4K";
+              name = "WEB-2160p";
               reset_unmatched_scores.enabled = true;
+              upgrade = {
+                allowed = true;
+                until_quality = "WEBDL-2160p";
+                until_score = 10000;
+              };
+              qualities = [
+                {
+                  name = "WEBDL-2160p";
+                  enabled = true;
+                }
+                {
+                  name = "WEBRip-2160p";
+                  enabled = true;
+                }
+                {
+                  name = "WEBDL-1080p";
+                  enabled = true;
+                }
+              ];
             }
             {
               name = "Remux-1080p - Anime";
               reset_unmatched_scores.enabled = true;
+              upgrade = {
+                allowed = true;
+                until_quality = "Bluray-1080p";
+                until_score = 10000;
+              };
+              qualities = [
+                {
+                  name = "Bluray-1080p";
+                  enabled = true;
+                }
+                {
+                  name = "WEBDL-1080p";
+                  enabled = true;
+                }
+                {
+                  name = "Bluray-720p";
+                  enabled = true;
+                }
+              ];
             }
           ];
         };

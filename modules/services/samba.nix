@@ -4,7 +4,6 @@
 {
   services.samba = {
     enable = true;
-    securityType = "user";
     openFirewall = true;
 
     settings = {
@@ -27,9 +26,9 @@
         "fruit:model" = "MacSamba";
       };
 
-      # Single share - requires password
+      # Single share
       files = {
-        path = "/data/Files"; # Change this from /data
+        path = "/data/Files";
         browseable = "yes";
         "read only" = "no";
         "guest ok" = "no";
@@ -49,7 +48,6 @@
     openFirewall = true;
   };
 
-  # Explicitly open firewall ports for Samba
   networking.firewall = {
     allowedTCPPorts = [
       139
