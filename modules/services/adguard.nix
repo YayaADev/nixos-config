@@ -14,6 +14,10 @@ in
       # Web interface
       http = {
         address = "0.0.0.0:${toString serviceConfig.port}";
+        trusted_proxies = [
+          "127.0.0.1"
+          "::1"
+        ];
       };
       # DNS configuration
       dns = {

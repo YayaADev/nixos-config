@@ -129,13 +129,11 @@ let
       createHome = true;
       homeDir = "/var/lib/qbittorrent";
     };
-    languageTutor = {
-      port = 9091;
-      hostname = "tutor.home";
-      description = "AI Language Tutor";
-      systemUser = true;
-      createHome = true;
-      homeDir = "/var/lib/language-tutor";
+    netdata = {
+      port = 19999;
+      hostname = "netdata.home";
+      description = "Netdata Monitoring";
+      systemUser = false;
     };
   };
 

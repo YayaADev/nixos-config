@@ -9,15 +9,16 @@
 {
   services.nginx = {
     enable = true;
-    recommendedProxySettings = true;
-    recommendedGzipSettings = true;
-    recommendedOptimisation = true;
     clientMaxBodySize = "50G";
 
     # WebDAV module support
     additionalModules = [ pkgs.nginxModules.dav ];
 
     appendHttpConfig = ''
+      # Fix proxy_headers_hash warning
+      proxy_headers_hash_max_size 1024;
+      proxy_headers_hash_bucket_size 128;
+
       # WebDAV specific settings
       client_body_temp_path /tmp/nginx_webdav_temp;
       dav_access user:rw group:rw all:r;
