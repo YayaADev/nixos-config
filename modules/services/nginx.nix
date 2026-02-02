@@ -9,6 +9,9 @@
 {
   services.nginx = {
     enable = true;
+    recommendedProxySettings = true;
+    recommendedGzipSettings = true;
+    recommendedOptimisation = true;
     clientMaxBodySize = "50G";
 
     # WebDAV module support
@@ -22,7 +25,7 @@
 
     # Automatically create virtual hosts for all services with hostnames
     virtualHosts =
-      (serviceHelpers.createAllNginxVirtualHosts constants.network.staticIP constants.nginxServices)
+      (serviceHelpers.createAllNginxVirtualHosts constants.nginxServices)
       //
       # Add WebDAV virtual host manually since it needs special config
       {

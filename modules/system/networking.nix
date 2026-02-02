@@ -2,7 +2,8 @@
   constants,
   pkgs,
   ...
-}: {
+}:
+{
   networking = {
     hostName = "nixos-cm3588";
     useNetworkd = true;
@@ -13,6 +14,13 @@
       "9.9.9.9"
       "1.1.1.1"
     ];
+  };
+
+  # Tell networkd: use DHCP for IP only, ignore its DNS. it keep sgetting overritten its annoying
+  systemd.network.networks."10-${constants.network.interface}" = {
+    matchConfig.Name = constants.network.interface;
+    networkConfig.DHCP = "ipv4";
+    dhcpV4Config.UseDNS = false;
   };
 
   networking.firewall = {

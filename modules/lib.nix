@@ -7,7 +7,7 @@
     ];
 
   # Helper function to create nginx virtual host for a service
-  createNginxVirtualHost = staticIP: _serviceName: serviceConfig:
+  createNginxVirtualHost = _serviceName: serviceConfig:
     lib.optionalAttrs (serviceConfig ? hostname) {
       ${serviceConfig.hostname} = {
         serverName = serviceConfig.hostname;
@@ -18,7 +18,7 @@
           }
         ];
         locations."/" = {
-          proxyPass = "http://${staticIP}:${toString serviceConfig.port}";
+          proxyPass = "http://127.0.0.1:${toString serviceConfig.port}";
           proxyWebsockets = true;
           extraConfig = ''
             proxy_set_header Host $host;
@@ -39,10 +39,10 @@
   createAllServiceDirectories = services:
     lib.flatten (lib.mapAttrsToList createServiceDirectories services);
 
-  createAllNginxVirtualHosts = staticIP: services:
+  createAllNginxVirtualHosts = services:
     lib.foldlAttrs (
       acc: serviceName: serviceConfig:
-        lib.recursiveUpdate acc (createNginxVirtualHost staticIP serviceName serviceConfig)
+        lib.recursiveUpdate acc (createNginxVirtualHost serviceName serviceConfig)
     ) {}
     services;
 

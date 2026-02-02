@@ -2,9 +2,11 @@
   serviceHelpers,
   constants,
   ...
-}: let
+}:
+let
   serviceConfig = constants.services.sonarr;
-in {
+in
+{
   services.sonarr = {
     enable = true;
     openFirewall = false;

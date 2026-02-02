@@ -1,6 +1,5 @@
 # Adguard wiki https://wiki.nixos.org/wiki/Adguard_Home
 {
-  lib,
   constants,
   ...
 }:
@@ -42,11 +41,14 @@ in
         safebrowsing_enabled = true;
         filters_update_interval = 24;
 
-        # Auto-generate DNS rewrites for services with hostnames
-        rewrites = lib.mapAttrsToList (_name: service: {
-          domain = service.hostname;
-          answer = constants.network.staticIP;
-        }) constants.nginxServices;
+        # All websites with home suffix gets rewritten
+        rewrites = [
+          {
+            domain = "*.home";
+            answer = constants.network.staticIP;
+            enabled = true;
+          }
+        ];
       };
 
       # Filter lists
