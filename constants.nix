@@ -135,6 +135,20 @@ let
       description = "Netdata Monitoring";
       systemUser = false;
     };
+    tdarr = {
+      port = 8265;
+      serverPort = 8266;
+      hostname = "tdarr.home";
+      description = "Tdarr Media Transcoding";
+      systemUser = true;
+      extraGroups = [
+        "video"
+        "render"
+        "media"
+      ];
+      createHome = true;
+      homeDir = "/var/lib/tdarr";
+    };
   };
 
   mediaGroup = {

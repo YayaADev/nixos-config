@@ -21,60 +21,31 @@
             { template = "radarr-custom-formats-uhd-bluray-web"; }
             { template = "radarr-quality-profile-uhd-bluray-web"; }
           ];
+
+          custom_formats = [
+            {
+              trash_ids = [ "0d91270a7255a1e388fa85e959f359d8" ]; # FreeLeech
+              assign_scores_to = [
+                {
+                  name = "HD Bluray + WEB";
+                  score = 100;
+                }
+                {
+                  name = "UHD Bluray + WEB";
+                  score = 100;
+                }
+              ];
+            }
+          ];
+
           quality_profiles = [
             {
               name = "HD Bluray + WEB";
               reset_unmatched_scores.enabled = true;
-              upgrade = {
-                allowed = true;
-                until_quality = "Bluray-1080p";
-                until_score = 10000;
-              };
-              qualities = [
-                {
-                  name = "Bluray-1080p";
-                  enabled = true;
-                }
-                {
-                  name = "WEBDL-1080p";
-                  enabled = true;
-                }
-                {
-                  name = "WEBRip-1080p";
-                  enabled = true;
-                }
-                {
-                  name = "Bluray-720p";
-                  enabled = true;
-                }
-              ];
             }
             {
               name = "UHD Bluray + WEB";
               reset_unmatched_scores.enabled = true;
-              upgrade = {
-                allowed = true;
-                until_quality = "Remux-2160p";
-                until_score = 10000;
-              };
-              qualities = [
-                {
-                  name = "Remux-2160p";
-                  enabled = true;
-                }
-                {
-                  name = "Bluray-2160p";
-                  enabled = true;
-                }
-                {
-                  name = "WEBDL-2160p";
-                  enabled = true;
-                }
-                {
-                  name = "Bluray-1080p";
-                  enabled = true;
-                }
-              ];
             }
           ];
         };
@@ -95,75 +66,41 @@
             { template = "sonarr-v4-quality-profile-anime"; }
           ];
 
+          custom_formats = [
+            {
+              trash_ids = [
+                "3bc5f395426614e155e585a2f056cdf1" # Season Pack
+                "d7c747094a7c65f4c2de083c24899e8b" # FreeLeech
+              ];
+              assign_scores_to = [
+                {
+                  name = "WEB-1080p";
+                  score = 100;
+                }
+                {
+                  name = "WEB-2160p";
+                  score = 100;
+                }
+                {
+                  name = "Remux-1080p - Anime";
+                  score = 100;
+                }
+              ];
+            }
+          ];
+
           quality_profiles = [
             {
               name = "WEB-1080p";
               reset_unmatched_scores.enabled = true;
-              upgrade = {
-                allowed = true;
-                until_quality = "WEBDL-1080p";
-                until_score = 10000;
-              };
-              qualities = [
-                {
-                  name = "WEBDL-1080p";
-                  enabled = true;
-                }
-                {
-                  name = "WEBRip-1080p";
-                  enabled = true;
-                }
-                {
-                  name = "HDTV-1080p";
-                  enabled = true;
-                }
-              ];
             }
             {
               name = "WEB-2160p";
               reset_unmatched_scores.enabled = true;
-              upgrade = {
-                allowed = true;
-                until_quality = "WEBDL-2160p";
-                until_score = 10000;
-              };
-              qualities = [
-                {
-                  name = "WEBDL-2160p";
-                  enabled = true;
-                }
-                {
-                  name = "WEBRip-2160p";
-                  enabled = true;
-                }
-                {
-                  name = "WEBDL-1080p";
-                  enabled = true;
-                }
-              ];
             }
             {
               name = "Remux-1080p - Anime";
               reset_unmatched_scores.enabled = true;
-              upgrade = {
-                allowed = true;
-                until_quality = "Bluray-1080p";
-                until_score = 10000;
-              };
-              qualities = [
-                {
-                  name = "Bluray-1080p";
-                  enabled = true;
-                }
-                {
-                  name = "WEBDL-1080p";
-                  enabled = true;
-                }
-                {
-                  name = "Bluray-720p";
-                  enabled = true;
-                }
-              ];
             }
           ];
         };

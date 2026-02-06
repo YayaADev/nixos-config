@@ -81,5 +81,7 @@
     strace
     niv
     tmux
+    smartmontools
+    pciutils
   ];
 }
