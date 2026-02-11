@@ -24,7 +24,7 @@
       rebuild-boot = "sudo nixos-rebuild boot --flake /home/nixos/nixos-config --impure";
       rebuild-dry = "nixos-rebuild build --flake /home/nixos/nixos-config --dry-run --impure";
 
-      # NixOS - remote builds (on x86 Ryzen 9)
+      # Remote builds (on x86 Ryzen 9)
       rebuild-remote = "sudo nixos-rebuild switch --flake /home/nixos/nixos-config --impure --max-jobs 0";
       rebuild-remote-test = "sudo nixos-rebuild test --flake /home/nixos/nixos-config --impure --max-jobs 0";
       rebuild-remote-boot = "sudo nixos-rebuild boot --flake /home/nixos/nixos-config --impure --max-jobs 0";
@@ -37,6 +37,7 @@
       nix-gc = "sudo nix-collect-garbage -d";
       nix-search = "nix search nixpkgs";
 
+      # Better defaults
       ll = "eza -la";
       la = "eza -a";
       tree = "eza --tree";
@@ -80,7 +81,6 @@
       '';
     };
 
-    # shellInit
     shellInit = ''
       # History
       HISTSIZE=10000
@@ -131,9 +131,8 @@
     '';
   };
 
+  # eza, bat, neofetch are used directly by the shell config above
   environment.systemPackages = with pkgs; [
-    zsh
-    oh-my-zsh
     eza
     bat
     neofetch
