@@ -2,10 +2,70 @@
   lib,
   serviceHelpers,
   constants,
+  pkgs,
   ...
 }: let
   serviceConfig = constants.services.immich;
 in {
+  nixpkgs.config.allowBroken = true;
+
+  #  Pin to Postgres 16. An upgrade used v17 but v16 is what works here
+  services.postgresql = {
+    enable = true;
+    package = pkgs.postgresql_16;
+    extensions = ps: [
+      ps.pgvecto-rs
+    ];
+    settings = {
+      shared_preload_libraries = "vectors";
+      listen_addresses = lib.mkForce "*";
+      port = 5432;
+    };
+  };
+
+  virtualisation = {
+    containers.enable = true;
+    podman = {
+      enable = true;
+      dockerCompat = true;
+      defaultNetwork.settings.dns_enabled = false;
+    };
+
+    # --- RKNN Machine Learning Container ---
+    oci-containers = {
+      backend = "podman";
+      containers = {
+        immich-ml-rknn = {
+          image = "ghcr.io/immich-app/immich-machine-learning:release-rknn";
+          autoStart = true;
+
+          ports = ["127.0.0.1:3003:3003"];
+
+          volumes = [
+            "immich-ml-cache:/cache"
+            "/sys/firmware/devicetree/base:/sys/firmware/devicetree/base:ro"
+            "/proc/device-tree:/proc/device-tree:ro"
+          ];
+
+          environment = {
+            # Use all cores
+            MACHINE_LEARNING_RKNN_THREADS = "3";
+          };
+
+          extraOptions = [
+            "--security-opt=systempaths=unconfined"
+            "--security-opt=apparmor=unconfined"
+            "--device=/dev/dri"
+            "--device=/dev/rga"
+            "--device=/dev/dma_heap"
+            "--device=/dev/mpp_service"
+            "--network=host"
+          ];
+        };
+      };
+    };
+  };
+
   services.immich = {
     enable = true;
     inherit (serviceConfig) port;
@@ -13,13 +73,20 @@ in {
     mediaLocation = "/data/photos";
 
     settings = {
+      machineLearning = {
+        enabled = true;
+        urls = ["http://127.0.0.1:3003"];
+        facialRecognition = {enabled = true;};
+        clip = {enabled = true;};
+      };
+
       ffmpeg = {
         crf = 23;
-        threads = 0; # Use all available threads
-        preset = "ultrafast"; # Encoding speed preset
-        accel = "rkmpp"; # Hardware acceleration for RK3588
-        accelDecode = true; # Hardware decode
-        targetVideoCodec = "h264"; # Most compatible codec
+        threads = 0;
+        preset = "ultrafast";
+        accel = "rkmpp";
+        accelDecode = true;
+        targetVideoCodec = "h264";
         acceptedVideoCodecs = [
           "h264"
           "hevc"
@@ -36,16 +103,16 @@ in {
           "webm"
         ];
         targetResolution = "original";
-        maxBitrate = "0"; # No limit
-        bframes = -1; # Auto
-        refs = 0; # Auto
-        gopSize = 0; # Auto keyframe interval
-        temporalAQ = false; # Temporal adaptive quantization
-        cqMode = "auto"; # Constant quality mode
-        twoPass = false; # Single pass encoding
-        preferredHwDevice = "auto"; # Auto hardware device selection
-        transcode = "optimal"; # The balance between storage and performance
-        tonemap = "hable"; # HDR tone mapping
+        maxBitrate = "0";
+        bframes = -1;
+        refs = 0;
+        gopSize = 0;
+        temporalAQ = false;
+        cqMode = "auto";
+        twoPass = false;
+        preferredHwDevice = "auto";
+        transcode = "optimal";
+        tonemap = "hable";
       };
 
       job = {
@@ -53,13 +120,13 @@ in {
           concurrency = 5;
         };
         smartSearch = {
-          concurrency = 2;
+          concurrency = 4;
         };
         metadataExtraction = {
           concurrency = 5;
         };
         faceDetection = {
-          concurrency = 2;
+          concurrency = 4;
         };
         search = {
           concurrency = 5;
@@ -86,16 +153,6 @@ in {
         template = "{{y}}/{{MM}}/{{filename}}";
       };
 
-      machineLearning = {
-        enabled = true;
-        facialRecognition = {
-          enabled = true;
-        };
-        clip = {
-          enabled = true;
-        };
-      };
-
       server = {
         externalDomain = "http://${serviceConfig.hostname}";
       };
@@ -104,24 +161,19 @@ in {
         enabled = true;
         days = 30;
       };
-
       user = {
         deleteDelay = 7;
       };
-
       logging = {
         enabled = true;
         level = "log";
       };
-
       newVersionCheck = {
         enabled = true;
       };
-
       passwordLogin = {
         enabled = true;
       };
-
       map = {
         enabled = true;
       };
@@ -134,24 +186,24 @@ in {
     "media"
   ];
 
-  # Override systemd service to allow hardware access
+  # Server needs device access for transcoding
   systemd.services.immich-server.serviceConfig = {
     PrivateDevices = lib.mkForce false;
     DeviceAllow = [
       "/dev/dri/renderD128 rw"
+      "/dev/dri/renderD129 rw"
       "/dev/dri/card0 rw"
+      "/dev/dri/card1 rw"
+      "/dev/rga rw"
+      "/dev/mpp_service rw"
+      "/dev/dma_heap rw"
     ];
   };
 
-  systemd.services.immich-machine-learning.serviceConfig = {
-    PrivateDevices = lib.mkForce false;
-    DeviceAllow = [
-      "/dev/dri/renderD128 rw"
-      "/dev/dri/card0 rw"
-    ];
-  };
+  # Ensure ML service doesn't start (we're using container)
+  systemd.services.immich-machine-learning.enable = lib.mkForce false;
 
-  # Create necessary directories
+  # --- Directory Structure ---
   systemd.tmpfiles.rules =
     [
       "d /data/photos 0755 immich immich -"
@@ -162,10 +214,25 @@ in {
     ]
     ++ serviceHelpers.createServiceDirectories "immich" serviceConfig;
 
-  # Udev rules for hardware access
+  #  Fix permissions on NPU/hardware devices
   services.udev.extraRules = ''
+    # Video devices
     SUBSYSTEM=="video4linux", KERNEL=="video[0-9]*", GROUP="video", MODE="0664"
+
+    # RGA (2D graphics accelerator)
     SUBSYSTEM=="misc", KERNEL=="rga", GROUP="video", MODE="0664"
+
+    # DRI/DRM devices
     SUBSYSTEM=="drm", KERNEL=="renderD*", GROUP="render", MODE="0664"
+    SUBSYSTEM=="drm", KERNEL=="card*", GROUP="video", MODE="0664"
+
+    # MPP service
+    SUBSYSTEM=="misc", KERNEL=="mpp_service", GROUP="video", MODE="0664"
+
+    # DMA heap
+    SUBSYSTEM=="dma_heap", KERNEL=="*", GROUP="video", MODE="0664"
+
+    # NPU device
+    SUBSYSTEM=="misc", KERNEL=="rknpu", GROUP="video", MODE="0664"
   '';
 }
