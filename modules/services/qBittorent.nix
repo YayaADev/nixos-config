@@ -4,21 +4,19 @@
   constants,
   envVars,
   ...
-}:
-let
+}: let
   serviceConfig = constants.services.qbittorrent;
 
   qbtUser = "qbittorrent";
   qbtGroup = "qbittorrent";
-in
-{
+in {
   virtualisation.podman.enable = true;
   users.users.${qbtUser} = {
     isSystemUser = true;
     group = qbtGroup;
     home = "/var/lib/${qbtUser}";
     createHome = true;
-    extraGroups = [ "media" ];
+    extraGroups = ["media"];
   };
 
   systemd = {
@@ -78,7 +76,7 @@ in
 
     timers.qbittorrent-health-check = {
       description = "Periodic health check for qBittorrent stack";
-      wantedBy = [ "timers.target" ];
+      wantedBy = ["timers.target"];
       timerConfig = {
         OnBootSec = "10min";
         OnUnitActiveSec = "30min";
@@ -96,7 +94,7 @@ in
         "--device=/dev/net/tun:/dev/net/tun"
         "--add-host=prowlarr.home:${constants.network.staticIP}"
       ];
-      volumes = [ "/var/lib/gluetun:/gluetun" ];
+      volumes = ["/var/lib/gluetun:/gluetun"];
 
       environment = {
         VPN_SERVICE_PROVIDER = "protonvpn";
@@ -154,7 +152,7 @@ in
     qbittorrent-nox = {
       image = "qbittorrentofficial/qbittorrent-nox:latest";
       autoStart = true;
-      dependsOn = [ "gluetun" ];
+      dependsOn = ["gluetun"];
       extraOptions = [
         "--network=container:gluetun"
         "--group-add=980"

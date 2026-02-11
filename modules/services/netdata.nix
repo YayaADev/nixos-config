@@ -1,11 +1,14 @@
-{ pkgs, lib, ... }:
 {
+  pkgs,
+  lib,
+  ...
+}: {
   nixpkgs.config.allowUnfreePredicate = pkg:
-    builtins.elem (lib.getName pkg) [ "netdata" ];
+    builtins.elem (lib.getName pkg) ["netdata"];
 
   services.netdata = {
     enable = true;
-    package = pkgs.netdata.override { withCloudUi = true; };
+    package = pkgs.netdata.override {withCloudUi = true;};
     config = {
       global = {
         "memory mode" = "dbengine";
@@ -15,5 +18,5 @@
     };
   };
 
-  networking.firewall.allowedTCPPorts = [ 19999 ];
+  networking.firewall.allowedTCPPorts = [19999];
 }

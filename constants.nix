@@ -1,9 +1,7 @@
 {
   envVars,
   pkgs,
-  ...
-}:
-let
+}: let
   secrets = envVars;
   inherit (pkgs) lib;
 
@@ -23,7 +21,7 @@ let
       port = 7844;
       description = "Cloudflare Tunnel";
       systemUser = true;
-      extraGroups = [ ];
+      extraGroups = [];
     };
     webdav = {
       port = 8080;
@@ -154,25 +152,7 @@ let
   mediaGroup = {
     name = "media";
   };
-
-  createUserForSystemService =
-    serviceName: serviceConfig:
-    lib.optionalAttrs (serviceConfig.systemUser or false) {
-      users.${serviceName} = {
-        isSystemUser = true;
-        inherit (serviceConfig) description;
-        group = serviceName;
-        extraGroups = serviceConfig.extraGroups or [ ];
-      }
-      // lib.optionalAttrs (serviceConfig.createHome or false) {
-        home = lib.mkForce (serviceConfig.homeDir or "/var/lib/${serviceName}");
-        createHome = true;
-      };
-
-      groups.${serviceName} = { };
-    };
-in
-{
+in {
   network = {
     inherit (secrets) staticIP;
     inherit (secrets) gateway;
@@ -191,6 +171,4 @@ in
   systemServices = lib.filterAttrs (_name: service: service.systemUser or false) services;
 
   allTcpPorts = lib.attrValues (lib.mapAttrs (_name: service: service.port) services);
-
-  inherit createUserForSystemService;
 }

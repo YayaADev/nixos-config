@@ -4,8 +4,7 @@
   lib,
   constants,
   ...
-}:
-{
+}: {
   services.nginx = {
     enable = true;
     recommendedProxySettings = true;
@@ -14,7 +13,7 @@
     clientMaxBodySize = "50G";
 
     # WebDAV module support
-    additionalModules = [ pkgs.nginxModules.dav ];
+    additionalModules = [pkgs.nginxModules.dav];
 
     appendHttpConfig = ''
       # Fix proxy_headers_hash warning
@@ -90,5 +89,5 @@
   ];
 
   # Make sure nginx can read/write to obsidian directory
-  users.users.nginx.extraGroups = [ "users" ];
+  users.users.nginx.extraGroups = ["users"];
 }

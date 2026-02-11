@@ -4,8 +4,7 @@
   constants,
   envVars,
   ...
-}:
-{
+}: {
   virtualisation.oci-containers.containers.unpackerr = {
     image = "ghcr.io/unpackerr/unpackerr:latest";
     autoStart = true;
@@ -50,7 +49,7 @@
   users.users.unpackerr = {
     isSystemUser = true;
     group = "unpackerr";
-    extraGroups = [ "media" ];
+    extraGroups = ["media"];
     uid = 1001;
   };
 

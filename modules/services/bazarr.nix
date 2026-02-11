@@ -2,11 +2,9 @@
   serviceHelpers,
   constants,
   ...
-}:
-let
+}: let
   serviceConfig = constants.services.bazarr;
-in
-{
+in {
   services.bazarr = {
     enable = true;
     openFirewall = false;

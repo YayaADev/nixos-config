@@ -2,11 +2,9 @@
   serviceHelpers,
   constants,
   ...
-}:
-let
+}: let
   serviceConfig = constants.services.prowlarr;
-in
-{
+in {
   services.prowlarr = {
     enable = true;
     openFirewall = false;

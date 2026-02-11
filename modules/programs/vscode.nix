@@ -2,8 +2,7 @@
   lib,
   pkgs,
   ...
-}:
-{
+}: {
   # === VS CODE REMOTE SSH SUPPORT ===
   programs.nix-ld = {
     enable = true;
@@ -28,8 +27,7 @@
         set -euo pipefail
         PATH=${
           lib.makeBinPath (
-            with pkgs;
-            [
+            with pkgs; [
               coreutils
               inotify-tools
               findutils
@@ -57,6 +55,6 @@
       Restart = "always";
       RestartSec = "0";
     };
-    wantedBy = [ "default.target" ];
+    wantedBy = ["default.target"];
   };
 }

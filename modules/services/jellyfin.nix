@@ -3,20 +3,20 @@
   serviceHelpers,
   constants,
   ...
-}:
-let
+}: let
   serviceConfig = constants.services.jellyfin;
-in
-{
+in {
   services.jellyfin = {
     enable = true;
     user = "jellyfin";
     group = "jellyfin";
   };
 
-  systemd.tmpfiles.rules = serviceHelpers.createServiceDirectories "jellyfin" serviceConfig ++ [
-    "Z /var/cache/jellyfin 0755 jellyfin jellyfin -"
-  ];
+  systemd.tmpfiles.rules =
+    serviceHelpers.createServiceDirectories "jellyfin" serviceConfig
+    ++ [
+      "Z /var/cache/jellyfin 0755 jellyfin jellyfin -"
+    ];
 
   environment.systemPackages = with pkgs; [
     jellyfin

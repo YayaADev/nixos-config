@@ -3,11 +3,9 @@
   serviceHelpers,
   constants,
   ...
-}:
-let
+}: let
   serviceConfig = constants.services.immich;
-in
-{
+in {
   services.immich = {
     enable = true;
     inherit (serviceConfig) port;
@@ -154,14 +152,15 @@ in
   };
 
   # Create necessary directories
-  systemd.tmpfiles.rules = [
-    "d /data/photos 0755 immich immich -"
-    "d /data/photos/upload 0755 immich immich -"
-    "d /data/photos/library 0755 immich immich -"
-    "d /data/photos/thumbs 0755 immich immich -"
-    "d /data/photos/encoded-video 0755 immich immich -"
-  ]
-  ++ serviceHelpers.createServiceDirectories "immich" serviceConfig;
+  systemd.tmpfiles.rules =
+    [
+      "d /data/photos 0755 immich immich -"
+      "d /data/photos/upload 0755 immich immich -"
+      "d /data/photos/library 0755 immich immich -"
+      "d /data/photos/thumbs 0755 immich immich -"
+      "d /data/photos/encoded-video 0755 immich immich -"
+    ]
+    ++ serviceHelpers.createServiceDirectories "immich" serviceConfig;
 
   # Udev rules for hardware access
   services.udev.extraRules = ''

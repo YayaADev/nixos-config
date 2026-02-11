@@ -2,9 +2,8 @@
   pkgs,
   constants,
   ...
-}:
-{
-  boot.supportedFilesystems = [ "btrfs" ];
+}: {
+  boot.supportedFilesystems = ["btrfs"];
 
   environment.systemPackages = with pkgs; [
     btrfs-progs
@@ -38,7 +37,7 @@
         "noatime"
         "subvol=media"
       ];
-      depends = [ "/data" ];
+      depends = ["/data"];
     };
 
     "/data/photos" = {
@@ -50,7 +49,7 @@
         "noatime"
         "subvol=photos"
       ];
-      depends = [ "/data" ];
+      depends = ["/data"];
     };
 
     "/data/obsidian" = {
@@ -62,7 +61,7 @@
         "noatime"
         "subvol=obsidian"
       ];
-      depends = [ "/data" ];
+      depends = ["/data"];
     };
   };
 
@@ -78,8 +77,8 @@
     services = {
       setup-storage-permissions = {
         description = "Setup proper storage permissions";
-        after = [ "local-fs.target" ];
-        wantedBy = [ "multi-user.target" ];
+        after = ["local-fs.target"];
+        wantedBy = ["multi-user.target"];
         serviceConfig = {
           Type = "oneshot";
           RemainAfterExit = true;
@@ -141,7 +140,7 @@
     timers = {
       btrfs-scrub = {
         description = "Monthly Btrfs scrub";
-        wantedBy = [ "timers.target" ];
+        wantedBy = ["timers.target"];
         timerConfig = {
           OnCalendar = "monthly";
           Persistent = true;

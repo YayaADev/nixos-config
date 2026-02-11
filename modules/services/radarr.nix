@@ -2,11 +2,9 @@
   serviceHelpers,
   constants,
   ...
-}:
-let
+}: let
   serviceConfig = constants.services.radarr;
-in
-{
+in {
   services.radarr = {
     enable = true;
     openFirewall = false;

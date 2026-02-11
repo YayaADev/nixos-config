@@ -2,8 +2,7 @@
   constants,
   pkgs,
   ...
-}:
-{
+}: {
   networking = {
     hostName = "nixos-cm3588";
     useNetworkd = true;
@@ -29,7 +28,6 @@
   };
 
   environment.systemPackages = with pkgs; [
-    nmap
     arp-scan
     dig
   ];

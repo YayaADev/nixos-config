@@ -3,11 +3,9 @@
   serviceHelpers,
   constants,
   ...
-}:
-let
+}: let
   serviceConfig = constants.services.jellyseerr;
-in
-{
+in {
   services.jellyseerr = {
     enable = true;
     inherit (serviceConfig) port;

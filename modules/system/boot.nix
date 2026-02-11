@@ -1,11 +1,10 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   # --- Boot Loader ---
   boot.loader.grub.enable = false;
   boot.loader.generic-extlinux-compatible.enable = true;
 
   # --- Firmware ---
-  hardware.firmware = [ pkgs.linux-firmware ];
+  hardware.firmware = [pkgs.linux-firmware];
   hardware.enableRedistributableFirmware = true;
 
   hardware.graphics = {

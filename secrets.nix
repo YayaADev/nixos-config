@@ -1,8 +1,4 @@
-{
-  envVars,
-  ...
-}:
-let
+{envVars, ...}: let
   user = envVars.userKey;
 
   nixos-cm3588 = envVars.hostKey;
@@ -11,8 +7,7 @@ let
     user
     nixos-cm3588
   ];
-in
-{
+in {
   "secrets/tailscale-authkey.age".publicKeys = allKeys;
   "secrets/cloudflared-creds.age".publicKeys = allKeys;
 }

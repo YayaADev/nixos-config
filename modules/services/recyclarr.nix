@@ -1,8 +1,4 @@
-{
-  envVars,
-  ...
-}:
-{
+{envVars, ...}: {
   services.recyclarr = {
     enable = true;
     user = "recyclarr";
@@ -15,16 +11,16 @@
           base_url = "http://radarr.home";
           api_key = envVars.radarr.apiKey;
           include = [
-            { template = "radarr-quality-definition-movie"; }
-            { template = "radarr-custom-formats-hd-bluray-web"; }
-            { template = "radarr-quality-profile-hd-bluray-web"; }
-            { template = "radarr-custom-formats-uhd-bluray-web"; }
-            { template = "radarr-quality-profile-uhd-bluray-web"; }
+            {template = "radarr-quality-definition-movie";}
+            {template = "radarr-custom-formats-hd-bluray-web";}
+            {template = "radarr-quality-profile-hd-bluray-web";}
+            {template = "radarr-custom-formats-uhd-bluray-web";}
+            {template = "radarr-quality-profile-uhd-bluray-web";}
           ];
 
           custom_formats = [
             {
-              trash_ids = [ "0d91270a7255a1e388fa85e959f359d8" ]; # FreeLeech
+              trash_ids = ["0d91270a7255a1e388fa85e959f359d8"]; # FreeLeech
               assign_scores_to = [
                 {
                   name = "HD Bluray + WEB";
@@ -57,13 +53,13 @@
           api_key = envVars.sonarr.apiKey;
 
           include = [
-            { template = "sonarr-quality-definition-series"; }
-            { template = "sonarr-v4-custom-formats-web-1080p"; }
-            { template = "sonarr-v4-quality-profile-web-1080p"; }
-            { template = "sonarr-v4-custom-formats-web-2160p"; }
-            { template = "sonarr-v4-quality-profile-web-2160p"; }
-            { template = "sonarr-v4-custom-formats-anime"; }
-            { template = "sonarr-v4-quality-profile-anime"; }
+            {template = "sonarr-quality-definition-series";}
+            {template = "sonarr-v4-custom-formats-web-1080p";}
+            {template = "sonarr-v4-quality-profile-web-1080p";}
+            {template = "sonarr-v4-custom-formats-web-2160p";}
+            {template = "sonarr-v4-quality-profile-web-2160p";}
+            {template = "sonarr-v4-custom-formats-anime";}
+            {template = "sonarr-v4-quality-profile-anime";}
           ];
 
           custom_formats = [

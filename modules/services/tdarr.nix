@@ -2,13 +2,11 @@
   config,
   constants,
   ...
-}:
-let
+}: let
   serviceConfig = constants.services.tdarr;
   tdarrUser = "tdarr";
   tdarrGroup = "tdarr";
-in
-{
+in {
   virtualisation.podman.enable = true;
 
   users.users.${tdarrUser} = {
@@ -23,7 +21,7 @@ in
     ];
   };
 
-  users.groups.${tdarrGroup} = { };
+  users.groups.${tdarrGroup} = {};
 
   systemd.tmpfiles.rules = [
     "d /var/lib/${tdarrUser} 0755 ${tdarrUser} ${tdarrGroup} -"

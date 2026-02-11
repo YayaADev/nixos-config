@@ -1,12 +1,7 @@
 # Adguard wiki https://wiki.nixos.org/wiki/Adguard_Home
-{
-  constants,
-  ...
-}:
-let
+{constants, ...}: let
   serviceConfig = constants.services.adguard;
-in
-{
+in {
   services.adguardhome = {
     enable = true;
     mutableSettings = true;
@@ -20,7 +15,7 @@ in
       };
       # DNS configuration
       dns = {
-        bind_hosts = [ "0.0.0.0" ];
+        bind_hosts = ["0.0.0.0"];
         port = 53;
         upstream_dns = [
           "9.9.9.9"
@@ -96,20 +91,20 @@ in
         enabled = true;
         interval = "24h";
         size_memory = 1000;
-        ignored = [ ];
+        ignored = [];
       };
 
       statistics = {
         enabled = true;
         interval = "24h";
-        ignored = [ ];
+        ignored = [];
       };
     };
   };
 
   # Firewall
   networking.firewall = {
-    allowedTCPPorts = [ 53 ];
-    allowedUDPPorts = [ 53 ];
+    allowedTCPPorts = [53];
+    allowedUDPPorts = [53];
   };
 }
