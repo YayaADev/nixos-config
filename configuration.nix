@@ -7,6 +7,8 @@ in
   imports = modules;
 
   time.timeZone = "America/Los_Angeles";
-  system.stateVersion = "25.05";
+  system.stateVersion = "26.05";
   services.resolved.enable = false;
+  nixpkgs.config.allowUnfreePredicate = pkg:
+  builtins.elem (lib.getName pkg) [ "netdata" ];
 }

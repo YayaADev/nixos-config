@@ -3,10 +3,12 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixos-rk3588 = {
-      url = "github:gnull/nixos-rk3588";
+
+    friendlyelecCM3588 = {
+      url = "github:YayaADev/nixos-friendlyelec-cm3588";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
     agenix = {
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -17,13 +19,20 @@
     inputs@{
       self,
       nixpkgs,
-      nixos-rk3588,
+      friendlyelecCM3588,
       agenix,
       ...
     }:
     let
       system = "aarch64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
+      pkgs = import nixpkgs {
+        inherit system;
+        config = {
+          allowUnfree = true;
+
+        };
+      };
+
       envVars = import /home/nixos/nixos-config/envVars.nix;
       constants = import ./constants.nix {
         inherit
@@ -37,30 +46,13 @@
     {
       nixosConfigurations.nixos-cm3588 = nixpkgs.lib.nixosSystem {
         inherit system;
+
         specialArgs = {
-          inherit
-            inputs
-            constants
-            envVars
-            nixos-rk3588
-            ;
-          rk3588 = {
-            inherit nixpkgs;
-            pkgsKernel = pkgs;
-          };
+          inherit inputs constants envVars;
         };
+
         modules = [
-          # Using OPi5+ CORE module for the vendor kernel NPU support. Same SOC as this
-          nixos-rk3588.nixosModules.boards.orangepi5plus.core
-
-          # Override DTB for CM3588. The CM3588 NAS wiring map is different than the orangepi5plus
-          (
-            { lib, ... }:
-            {
-              hardware.deviceTree.name = lib.mkForce "rockchip/rk3588-nanopc-cm3588-nas.dtb";
-            }
-          )
-
+          friendlyelecCM3588.nixosModules.cm3588
           ./configuration.nix
           ./hardware-configuration.nix
           agenix.nixosModules.age
