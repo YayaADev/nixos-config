@@ -1,8 +1,10 @@
+# modules/services/immich.nix
 {
   lib,
   serviceHelpers,
   constants,
   pkgs,
+  config,
   ...
 }: let
   serviceConfig = constants.services.immich;
@@ -23,47 +25,30 @@ in {
     };
   };
 
-  virtualisation = {
-    containers.enable = true;
-    podman = {
-      enable = true;
-      dockerCompat = true;
-      defaultNetwork.settings.dns_enabled = false;
+  virtualisation.oci-containers.containers.immich-ml-rknn = {
+    image = "ghcr.io/immich-app/immich-machine-learning:release-rknn";
+    autoStart = true;
+
+    environment = {
+      TZ = config.time.timeZone;
+      MACHINE_LEARNING_RKNN_THREADS = "3";
     };
 
-    # --- RKNN Machine Learning Container ---
-    oci-containers = {
-      backend = "podman";
-      containers = {
-        immich-ml-rknn = {
-          image = "ghcr.io/immich-app/immich-machine-learning:release-rknn";
-          autoStart = true;
+    volumes = [
+      "immich-ml-cache:/cache"
+      "/sys/firmware/devicetree/base:/sys/firmware/devicetree/base:ro"
+      "/proc/device-tree:/proc/device-tree:ro"
+    ];
 
-          ports = ["127.0.0.1:3003:3003"];
-
-          volumes = [
-            "immich-ml-cache:/cache"
-            "/sys/firmware/devicetree/base:/sys/firmware/devicetree/base:ro"
-            "/proc/device-tree:/proc/device-tree:ro"
-          ];
-
-          environment = {
-            # Use all cores
-            MACHINE_LEARNING_RKNN_THREADS = "3";
-          };
-
-          extraOptions = [
-            "--security-opt=systempaths=unconfined"
-            "--security-opt=apparmor=unconfined"
-            "--device=/dev/dri"
-            "--device=/dev/rga"
-            "--device=/dev/dma_heap"
-            "--device=/dev/mpp_service"
-            "--network=host"
-          ];
-        };
-      };
-    };
+    extraOptions = [
+      "--label=io.containers.autoupdate=registry"
+      "--security-opt=systempaths=unconfined"
+      "--security-opt=apparmor=unconfined"
+      "--device=/dev/dri"
+      "--device=/dev/rga"
+      "--device=/dev/dma_heap"
+      "--device=/dev/mpp_service"
+    ];
   };
 
   services.immich = {
@@ -76,8 +61,12 @@ in {
       machineLearning = {
         enabled = true;
         urls = ["http://127.0.0.1:3003"];
-        facialRecognition = {enabled = true;};
-        clip = {enabled = true;};
+        facialRecognition = {
+          enabled = true;
+        };
+        clip = {
+          enabled = true;
+        };
       };
 
       ffmpeg = {

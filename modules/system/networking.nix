@@ -1,12 +1,13 @@
-{
-  constants,
-  pkgs,
-  ...
-}: {
+{constants, ...}: {
   networking = {
     hostName = "nixos-cm3588";
     useNetworkd = true;
     interfaces.${constants.network.interface}.useDHCP = true;
+
+    firewall = {
+      allowedTCPPorts = constants.allTcpPorts;
+      trustedInterfaces = ["lo"]; # Trust loopback interface
+    };
   };
 
   # This guarantees /etc/resolv.conf exists and points to AdGuard (localhost)
@@ -22,13 +23,4 @@
     networkConfig.DHCP = "ipv4";
     dhcpV4Config.UseDNS = false;
   };
-
-  networking.firewall = {
-    allowedTCPPorts = constants.allTcpPorts;
-  };
-
-  environment.systemPackages = with pkgs; [
-    arp-scan
-    dig
-  ];
 }

@@ -31,7 +31,6 @@ Some services online (when they work)
 | **Bazarr** | 6767 | `bazarr.home` | Subtitle management |
 | **qBittorrent** | 8090 | `qbittorrent.home` | Client (VPN binded) |
 | **Audiobookshelf** | 13378 | `audiobookshelf.home` | Audiobook server |
-| **LazyLibrarian** | 5299 | `lazylibrarian.home` | Book management |
 
 ### Other Services
 | Service | Port | Internal URL | Purpose |

@@ -5,12 +5,28 @@
   envVars,
   ...
 }: {
+  # User and group with specific uid/gid
+  users.users.unpackerr = {
+    isSystemUser = true;
+    group = "unpackerr";
+    extraGroups = ["media"];
+    uid = 1001;
+  };
+
+  users.groups.unpackerr = {
+    gid = 1001;
+  };
+
+  # Container
   virtualisation.oci-containers.containers.unpackerr = {
     image = "ghcr.io/unpackerr/unpackerr:latest";
     autoStart = true;
 
     environment = {
       TZ = config.time.timeZone;
+      # Use specific PUID/PGID for this service
+      PUID = "1001";
+      PGID = "1001";
       UN_INTERVAL = "2m";
       UN_START_DELAY = "1m";
       UN_RETRY_DELAY = "5m";
@@ -41,19 +57,7 @@
     ];
 
     extraOptions = [
-      "--network=host" # So it can reach radarr.home, sonarr.home
       "--label=io.containers.autoupdate=registry"
     ];
-  };
-
-  users.users.unpackerr = {
-    isSystemUser = true;
-    group = "unpackerr";
-    extraGroups = ["media"];
-    uid = 1001;
-  };
-
-  users.groups.unpackerr = {
-    gid = 1001;
   };
 }

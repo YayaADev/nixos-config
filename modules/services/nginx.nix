@@ -10,7 +10,7 @@
     recommendedProxySettings = true;
     recommendedGzipSettings = true;
     recommendedOptimisation = true;
-    clientMaxBodySize = "50G";
+    clientMaxBodySize = "50G"; # For images/videos in immich
 
     # WebDAV module support
     additionalModules = [pkgs.nginxModules.dav];

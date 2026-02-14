@@ -18,7 +18,7 @@ in {
   programs.git.enable = true;
 
   environment.systemPackages = with pkgs; [
-    alejandra # matches flake formatter output — available system-wide on the SBC
+    alejandra
     vim
     wget
     curl
@@ -40,6 +40,9 @@ in {
     tmux
     smartmontools
     pciutils
+    arp-scan
+    dig
+    claude-code
   ];
 
   nix = {

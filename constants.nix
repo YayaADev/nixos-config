@@ -83,12 +83,6 @@
       createHome = true;
       homeDir = "/var/lib/radarr";
     };
-    lazylibrarian = {
-      port = 5299;
-      hostname = "lazylibrarian.home";
-      description = "LazyLibrarian Book Management";
-      systemUser = false;
-    };
     prowlarr = {
       port = 9696;
       hostname = "prowlarr.home";
@@ -146,6 +140,30 @@
       ];
       createHome = true;
       homeDir = "/var/lib/tdarr";
+    };
+    shelfarr = {
+      port = 5056;
+      hostname = "shelfarr.home";
+      description = "Shelfarr Book Request Management";
+      systemUser = true;
+      extraGroups = [
+        "users"
+        "media"
+      ];
+      createHome = true;
+      homeDir = "/var/lib/shelfarr";
+    };
+    audiobookshelf = {
+      port = 13378;
+      hostname = "audiobookshelf.home";
+      description = "Audiobookshelf Audiobook Server";
+      systemUser = true;
+      extraGroups = [
+        "users"
+        "media"
+      ];
+      createHome = true;
+      homeDir = "/var/lib/audiobookshelf";
     };
   };
 

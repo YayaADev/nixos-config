@@ -144,7 +144,6 @@ in {
 
       ports = [
         "${toString serviceConfig.port}:${toString serviceConfig.port}/tcp"
-        "${toString constants.services.lazylibrarian.port}:5299/tcp"
         "8000:8000/tcp"
       ];
     };

@@ -36,7 +36,6 @@
   }: let
     targetSystem = "aarch64-linux";
 
-    # Both machines need dev tooling — x86 PC and the SBC itself
     devSystems = [
       "x86_64-linux"
       "aarch64-linux"
@@ -50,7 +49,6 @@
 
     forDevSystems = nixpkgs.lib.genAttrs devSystems;
 
-    # treefmt configuration — alejandra for .nix files
     treefmtEval = forDevSystems (
       system:
         treefmt-nix.lib.evalModule (pkgsFor system) {
