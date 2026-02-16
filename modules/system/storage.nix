@@ -69,7 +69,10 @@
     tmpfiles.rules = [
       "d /data 0755 root root -"
       "d /data/media 2775 root ${constants.mediaGroup.name} -"
-      "d /data/torrents 0777 root root -"
+      "d /data/media/downloads 2775 root media -"
+      "d /data/media/downloads/movies 2775 qbittorrent media -"
+      "d /data/media/downloads/tv 2775 qbittorrent media -"
+      "d /data/media/downloads/shelfarr 2775 shelfarr media -"
       "d /data/photos 0750 immich immich -"
       "d /data/obsidian 0775 nginx nginx -"
     ];
@@ -96,7 +99,7 @@
           chown -h nixos:users /home/nixos/data
 
           # Heavy operations - only run once (bump version to re-run)
-          MARKER="/data/.permissions_fixed_v1"
+          MARKER="/data/.permissions_fixed_v3"
           if [ -f "$MARKER" ]; then
             echo "Permissions already set, skipping."
             exit 0
@@ -110,6 +113,14 @@
           find /data/media -type f -exec chmod 664 {} \;
           ${pkgs.acl}/bin/setfacl -R -d -m g:${constants.mediaGroup.name}:rwx /data/media
           ${pkgs.acl}/bin/setfacl -R -m g:${constants.mediaGroup.name}:rwx /data/media
+
+          # Shelfarr runs as UID 1000 inside its container - grant write access
+          ${pkgs.acl}/bin/setfacl -R -m u:1000:rwx /data/media/audiobooks /data/media/books /data/media/downloads/shelfarr
+          ${pkgs.acl}/bin/setfacl -R -d -m u:1000:rwx /data/media/audiobooks /data/media/books /data/media/downloads/shelfarr
+
+          # qBittorrent runs as UID 988 inside its container without media group membership
+          ${pkgs.acl}/bin/setfacl -R -m u:qbittorrent:rwx /data/media/downloads
+          ${pkgs.acl}/bin/setfacl -R -d -m u:qbittorrent:rwx /data/media/downloads
 
           # Photos
           chown -R immich:immich /data/photos

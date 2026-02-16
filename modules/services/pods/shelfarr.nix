@@ -19,7 +19,7 @@ in {
 
   systemd.tmpfiles.rules = [
     "d ${cfg.homeDir} 0755 shelfarr shelfarr -"
-    "d ${cfg.homeDir}/data 0755 shelfarr shelfarr -"
+    "d ${cfg.homeDir}/data 0770 1000 1000 -"
   ];
 
   virtualisation.oci-containers.containers.shelfarr = {
@@ -46,8 +46,7 @@ in {
       "${cfg.homeDir}/data:/rails/storage"
       "/data/media/audiobooks:/audiobooks"
       "/data/media/books:/ebooks"
-      "/data/torrents/audiobooks:/downloads/audiobooks"
-      "/data/torrents/books:/downloads/books"
+      "/data/media/downloads/shelfarr:/downloads"
     ];
 
     extraOptions = [

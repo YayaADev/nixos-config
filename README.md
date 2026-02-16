@@ -4,13 +4,16 @@ My NixOS configuration for a home server running on FriendlyElec CM3588+ SBC.
 
 ## Overview
 
-Some services online (when they work)
-- **Media Management**: Complete *arr stack + Jellyfin
-- **Network Services**: DNS filtering, reverse proxy
-- **Monitoring**: None gl
-- **Storage**: Btrfs with compression. RAID1 setup across 3 drives
-- **Security**: Tailscale VPN, Cloudflare tunnels
-- **Development**: VS Code remote support, Nix development tools
+Self-hosted media and services infrastructure on FriendlyElec CM3588+ with Podman containerization.
+
+- **Media Management**: Complete *arr stack (Sonarr, Radarr, Prowlarr, Bazarr) + Jellyfin media server
+- **Request Management**: Jellyseerr (TV/movies), Shelfarr (books/audiobooks)
+- **Network Services**: DNS filtering (AdGuard), reverse proxy (Nginx), VPN (Tailscale, Cloudflare)
+- **Storage**: Btrfs RAID1 across 3 NVMe SSDs (~3.6TB usable)
+- **Containerization**: Podman infrastructure with auto-update timers
+- **Photo Management**: Immich with AI features
+- **File Sharing**: Samba file server
+- **Security**: Tailscale VPN, Cloudflare tunnels, agenix secrets management
 
 ## Services Overview
 
@@ -33,30 +36,52 @@ Some services online (when they work)
 | **Audiobookshelf** | 13378 | `audiobookshelf.home` | Audiobook server |
 
 ### Other Services
-| Service | Port | Internal URL | Purpose |
-|---------|------|--------------|---------|
-| **Immich** | 3001 | `immich.home` | Photo management & AI |
-| **WebDAV** | 8080 | `webdav.home` | Obsidian sync server |
-| **FlareSolverr** | 8191 | `flaresolverr.home` | Cloudflare bypass |
+| Service | Port | Internal URL | Purpose | Type |
+|---------|------|--------------|---------|------|
+| **Immich** | 3001 | `immich.home` | Photo management & AI | Podman |
+| **Shelfarr** | 5056 | `shelfarr.home` | Book/audiobook request management | Podman |
+| **Tdarr** | 8265 | `tdarr.home` | Media transcoding | Podman |
+| **WebDAV** | 8080 | `webdav.home` | Obsidian sync server | Native |
+| **FlareSolverr** | 8191 | `flaresolverr.home` | Cloudflare bypass | Native |
+| **Samba** | 445 | - | SMB file sharing | Native |
 
 ### Network & Security
 - **Tailscale**: VPN with subnet routing and exit node
 - **Cloudflare Tunnel**: Secure external access to Jellyfin and Jellyseerr
-- **Gluetun**: VPN container for torrent traffic
+- **Podman Auto-Update**: Automatic container updates every Monday 02:00
+- **Podman Restart**: Automatic restart of updated containers every Tuesday 02:00
 
 ## Storage Configuration
 
-### Subvolumes
-- `media` → `/data/media` (movies, TV, books, audiobooks)
-- `photos` → `/data/photos` (Immich storage)  
-- `obsidian` → `/data/obsidian` (WebDAV for Obsidian)
-- `torrents` → `/data/torrents` (qBittorrent downloads)
+### Hardware
+- **3× NVMe SSDs** (2× 1.8TB + 1× 3.6TB) in Btrfs RAID1 = ~3.6TB usable
+- **56GB eMMC** for OS and service state (`/`, `/var/lib/`)
+- **All data** on SSDs: `/data` and its subvolumes
+
+### Btrfs Subvolumes & Compression
+| Mount | Subvolume | Compression | Contents |
+|-------|-----------|-------------|----------|
+| `/data` | `/` | `zstd:3` | Root, torrents staging |
+| `/data/media` | `media` | `zstd:3` | Movies, TV, books, audiobooks |
+| `/data/media/downloads` | (same as media) | `zstd:3` | Torrent/request staging |
+| `/data/photos` | `photos` | `zstd:3` | Immich photos & RAW files |
+| `/data/obsidian` | `obsidian` | `zstd:3` | Obsidian notes |
+
+**Critical:** `/data` and `/data/media` are different subvolumes. Services that hardlink files must operate within the same subvolume.
+
+### Media Download Layout
+```
+/data/media/downloads/
+  movies/        # qBittorrent staging → Radarr hardlinks to /data/media/movies
+  tv/            # qBittorrent staging → Sonarr hardlinks to /data/media/tv
+  shelfarr/      # Shelfarr downloads for books & audiobooks
+```
 
 ### Automatic Maintenance
-- **Monthly scrubbing** for data integrity
+- **Weekly scrubbing** for data integrity
 - **Weekly garbage collection** for Nix store
-- **Daily auto-updates** at 4 AM
-- **Automatic compression** and deduplication
+- **Weekly pruning** of unused Podman networks
+- **Automatic compression** via Btrfs zstd:3
 
 ## Security Features
 

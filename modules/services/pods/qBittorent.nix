@@ -26,9 +26,36 @@ in {
       "d /var/lib/${qbtUser}/qBittorrent 0750 ${qbtUser} ${qbtGroup} -"
       "d /var/lib/${qbtUser}/qBittorrent/config 0750 ${qbtUser} ${qbtGroup} -"
 
-      "Z /data/torrents 0775 ${qbtUser} media -"
       "Z /data/media 0775 root media -"
     ];
+
+    services.mam-dynamic-seedbox = {
+      description = "Register MAM Dynamic Seedbox IP via VPN tunnel";
+      after = ["podman-gluetun.service"];
+      wants = ["podman-gluetun.service"];
+      serviceConfig = {
+        Type = "oneshot";
+      };
+      script = ''
+        echo "Waiting for Gluetun to be ready..."
+        timeout=120
+        while [ $timeout -gt 0 ]; do
+          if ${pkgs.curl}/bin/curl -sf --connect-timeout 5 http://localhost:8000/v1/openvpn/status >/dev/null 2>&1; then
+            break
+          fi
+          sleep 2
+          timeout=$((timeout - 2))
+        done
+        [ $timeout -le 0 ] && echo "Gluetun not ready, skipping MAM seedbox update" && exit 1
+
+        echo "Registering MAM Dynamic Seedbox IP..."
+        result=$(${pkgs.podman}/bin/podman exec gluetun \
+          wget --quiet -O- \
+          --header="Cookie: mam_id=${envVars.mam.vpnSessionId}" \
+          https://t.myanonamouse.net/json/dynamicSeedbox.php 2>&1)
+        echo "MAM response: $result"
+      '';
+    };
 
     services.qbittorrent-health-check = {
       description = "qBittorrent-nox and Gluetun health check";
@@ -74,6 +101,16 @@ in {
       '';
     };
 
+    timers.mam-dynamic-seedbox = {
+      description = "Periodic MAM Dynamic Seedbox IP refresh";
+      wantedBy = ["timers.target"];
+      timerConfig = {
+        OnBootSec = "5min";
+        OnUnitActiveSec = "45min";
+        Unit = "mam-dynamic-seedbox.service";
+      };
+    };
+
     timers.qbittorrent-health-check = {
       description = "Periodic health check for qBittorrent stack";
       wantedBy = ["timers.target"];
@@ -93,6 +130,7 @@ in {
         "--cap-add=NET_ADMIN"
         "--device=/dev/net/tun:/dev/net/tun"
         "--add-host=prowlarr.home:${constants.network.staticIP}"
+        "--add-host=prowlarr:${constants.network.staticIP}"
       ];
       volumes = ["/var/lib/gluetun:/gluetun"];
 
@@ -158,7 +196,6 @@ in {
       ];
       volumes = [
         "/var/lib/${qbtUser}:/config"
-        "/data/torrents:/data/torrents"
         "/data/media:/data/media"
       ];
       environment = {

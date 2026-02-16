@@ -8,3 +8,4 @@ envVars.nix
 # Development tools
 .vscode/
 nix/
+CLAUDE.md

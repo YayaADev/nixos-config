@@ -18,22 +18,6 @@
             {template = "radarr-quality-profile-uhd-bluray-web";}
           ];
 
-          custom_formats = [
-            {
-              trash_ids = ["0d91270a7255a1e388fa85e959f359d8"]; # FreeLeech
-              assign_scores_to = [
-                {
-                  name = "HD Bluray + WEB";
-                  score = 100;
-                }
-                {
-                  name = "UHD Bluray + WEB";
-                  score = 100;
-                }
-              ];
-            }
-          ];
-
           quality_profiles = [
             {
               name = "HD Bluray + WEB";
@@ -66,7 +50,6 @@
             {
               trash_ids = [
                 "3bc5f395426614e155e585a2f056cdf1" # Season Pack
-                "d7c747094a7c65f4c2de083c24899e8b" # FreeLeech
               ];
               assign_scores_to = [
                 {
