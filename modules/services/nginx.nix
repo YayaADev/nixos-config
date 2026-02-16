@@ -2,6 +2,7 @@
   serviceHelpers,
   pkgs,
   lib,
+  config,
   constants,
   ...
 }: {
@@ -35,7 +36,7 @@
       # Add WebDAV virtual host manually since it needs special config
       {
         "webdav.home" = {
-          serverName = "webdav.home";
+          serverName = "webdav.home webdav.peakmalephysique.dev";
           listen = [
             {
               addr = "0.0.0.0";
@@ -46,6 +47,10 @@
           locations."/" = {
             root = "/data/obsidian";
             extraConfig = ''
+              # HTTP Basic Auth
+              auth_basic "Obsidian WebDAV";
+              auth_basic_user_file ${config.age.secrets.webdav-htpasswd.path};
+
               # Enable WebDAV methods
               dav_methods PUT DELETE MKCOL COPY MOVE;
               dav_ext_methods PROPFIND;
@@ -64,7 +69,7 @@
               if ($request_method = 'OPTIONS') {
                 add_header 'Access-Control-Allow-Origin' '*';
                 add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS, PROPFIND, MKCOL, COPY, MOVE';
-                add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Depth,Destination,Overwrite';
+                add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Depth,Destination,Overwrite,Authorization';
                 add_header 'Access-Control-Max-Age' 1728000;
                 add_header 'Content-Type' 'text/plain; charset=utf-8';
                 add_header 'Content-Length' 0;

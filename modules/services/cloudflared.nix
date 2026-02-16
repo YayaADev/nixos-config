@@ -14,6 +14,7 @@
         ingress = {
           "jellyfin.peakmalephysique.dev" = "http://localhost:${toString constants.services.jellyfin.port}";
           "requests.peakmalephysique.dev" = "http://localhost:${toString constants.services.jellyseerr.port}";
+          "webdav.peakmalephysique.dev" = "http://localhost:${toString constants.services.webdav.port}";
         };
         default = "http_status:404";
       };

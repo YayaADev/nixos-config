@@ -15,5 +15,12 @@ in {
       group = "cloudflared";
       mode = "0400";
     };
+
+    webdav-htpasswd = {
+      file = "${secretsDir}/webdav-htpasswd.age";
+      owner = "nginx";
+      group = "nginx";
+      mode = "0400";
+    };
   };
 }

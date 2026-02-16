@@ -10,4 +10,5 @@
 in {
   "secrets/tailscale-authkey.age".publicKeys = allKeys;
   "secrets/cloudflared-creds.age".publicKeys = allKeys;
+  "secrets/webdav-htpasswd.age".publicKeys = allKeys;
 }

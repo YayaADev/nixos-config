@@ -46,10 +46,11 @@ Self-hosted media and services infrastructure on FriendlyElec CM3588+ with Podma
 | **WebDAV** | 8080 | `webdav.home` | Obsidian sync server | Native |
 | **FlareSolverr** | 8191 | `flaresolverr.home` | Cloudflare bypass | Native |
 | **Samba** | 445 | - | SMB file sharing | Native |
+| **WebDAV** | 8080 | `webdav.home` | Obsidian sync (HTTP Basic Auth, HTTPS via Cloudflare) | Native |
 
 ### Network & Security
 - **Tailscale**: VPN with subnet routing and exit node
-- **Cloudflare Tunnel**: Secure external access to Jellyfin and Jellyseerr
+- **Cloudflare Tunnel**: Secure external access to Jellyfin, Jellyseerr, and WebDAV
 - **qBittorrent**: ProtonVPN via Gluetun with automatic port forwarding
 - **Podman Timers**:
   - Monday 02:00: Auto-update container images
@@ -104,8 +105,9 @@ Self-hosted media and services infrastructure on FriendlyElec CM3588+ with Podma
 
 ### External Access
 - **Tailscale**: Secure VPN access to entire network
-- **Cloudflare Tunnel**: Encrypted tunnel for select services
-- **No Port Forwarding**: Using cloudflare
+- **Cloudflare Tunnel**: Encrypted tunnel for Jellyfin, Jellyseerr, WebDAV
+- **WebDAV**: HTTP Basic Auth + client-side E2E encryption for Obsidian notes
+- **No Port Forwarding**: Using Cloudflare for remote access
 
 
 ### System Management
@@ -160,8 +162,14 @@ All services available via `.home` domains:
 - http://jellyfin.home
 - http://jellyseerr.home
 - http://adguard.home
+- http://webdav.home:8080 (requires Basic Auth)
 - etc.
 
+### External Access (via Cloudflare Tunnel)
+Select services exposed via HTTPS at `*.peakmalephysique.dev`:
+- **Jellyfin**: https://jellyfin.peakmalephysique.dev
+- **Jellyseerr**: https://requests.peakmalephysique.dev
+- **WebDAV**: https://webdav.peakmalephysique.dev (requires Basic Auth + optional E2E encryption)
 
 ### Backup Strategy
 - **Configuration**: Git repository (this repo)
