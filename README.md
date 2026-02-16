@@ -32,15 +32,17 @@ Self-hosted media and services infrastructure on FriendlyElec CM3588+ with Podma
 | **Radarr** | 7878 | `radarr.home` | Movie management |
 | **Prowlarr** | 9696 | `prowlarr.home` | Indexer management |
 | **Bazarr** | 6767 | `bazarr.home` | Subtitle management |
-| **qBittorrent** | 8090 | `qbittorrent.home` | Client (VPN binded) |
+| **qBittorrent** | 8090 | `qbittorrent.home` | Torrent client (VPN via Gluetun, auto port-forward) |
 | **Audiobookshelf** | 13378 | `audiobookshelf.home` | Audiobook server |
 
 ### Other Services
 | Service | Port | Internal URL | Purpose | Type |
 |---------|------|--------------|---------|------|
-| **Immich** | 3001 | `immich.home` | Photo management & AI | Podman |
+| **Immich** | 3001 | `immich.home` | Photo management with AI | Podman |
 | **Shelfarr** | 5056 | `shelfarr.home` | Book/audiobook request management | Podman |
-| **Tdarr** | 8265 | `tdarr.home` | Media transcoding | Podman |
+| **Tdarr** | 8265 | `tdarr.home` | Media transcoding (GPU-accelerated) | Podman |
+| **Unpackerr** | - | - | Archive extraction & import automation | Podman |
+| **Gluetun** | 8000 | - | VPN tunnel (ProtonVPN) for qBittorrent | Podman |
 | **WebDAV** | 8080 | `webdav.home` | Obsidian sync server | Native |
 | **FlareSolverr** | 8191 | `flaresolverr.home` | Cloudflare bypass | Native |
 | **Samba** | 445 | - | SMB file sharing | Native |
@@ -48,8 +50,12 @@ Self-hosted media and services infrastructure on FriendlyElec CM3588+ with Podma
 ### Network & Security
 - **Tailscale**: VPN with subnet routing and exit node
 - **Cloudflare Tunnel**: Secure external access to Jellyfin and Jellyseerr
-- **Podman Auto-Update**: Automatic container updates every Monday 02:00
-- **Podman Restart**: Automatic restart of updated containers every Tuesday 02:00
+- **qBittorrent**: ProtonVPN via Gluetun with automatic port forwarding
+- **Podman Timers**:
+  - Monday 02:00: Auto-update container images
+  - Tuesday 02:00: Restart updated containers
+  - Wednesday 03:00: Verify/refresh storage ACLs
+  - Sunday 03:00: Prune unused Podman networks
 
 ## Storage Configuration
 
@@ -78,16 +84,21 @@ Self-hosted media and services infrastructure on FriendlyElec CM3588+ with Podma
 ```
 
 ### Automatic Maintenance
-- **Weekly scrubbing** for data integrity
-- **Weekly garbage collection** for Nix store
-- **Weekly pruning** of unused Podman networks
+- **Monthly Btrfs scrub** (via `btrfs-scrub` service)
+- **Weekly ACL refresh** (Wednesday 03:00 — `setup-media-acls` timer)
+- **Weekly garbage collection** for Nix store (`nix-gc` alias)
+- **Weekly Podman cleanup** (Sunday 03:00 — prunes unused networks & containers)
+- **Weekly container updates** (Monday/Tuesday cycle)
 - **Automatic compression** via Btrfs zstd:3
 
 ## Security Features
 
 ### Access Control
-- **User Isolation**: Each service runs as dedicated user
-- **Group Management**: `media` group for shared file access
+- **User Isolation**: Each service runs as dedicated user/group
+- **ACL-Based Permissions**: Fine-grained file access via Linux ACLs
+  - Media group (GID 980) for most services
+  - Per-service ACLs for containerized apps without proper group membership
+  - Tdarr: GPU device access via udev rules
 - **SSH Keys**: Password authentication disabled
 - **Secrets Management**: Encrypted with agenix
 

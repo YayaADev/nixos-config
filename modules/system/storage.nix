@@ -69,17 +69,22 @@
     tmpfiles.rules = [
       "d /data 0755 root root -"
       "d /data/media 2775 root ${constants.mediaGroup.name} -"
-      "d /data/media/downloads 2775 root media -"
-      "d /data/media/downloads/movies 2775 qbittorrent media -"
-      "d /data/media/downloads/tv 2775 qbittorrent media -"
-      "d /data/media/downloads/shelfarr 2775 shelfarr media -"
+      "d /data/media/movies 2775 root ${constants.mediaGroup.name} -"
+      "d /data/media/tv 2775 root ${constants.mediaGroup.name} -"
+      "d /data/media/books 2775 root ${constants.mediaGroup.name} -"
+      "d /data/media/audiobooks 2775 root ${constants.mediaGroup.name} -"
+      "d /data/media/downloads 2775 root ${constants.mediaGroup.name} -"
+      "d /data/media/downloads/movies 2775 qbittorrent ${constants.mediaGroup.name} -"
+      "d /data/media/downloads/tv 2775 qbittorrent ${constants.mediaGroup.name} -"
+      "d /data/media/downloads/shelfarr 2775 shelfarr ${constants.mediaGroup.name} -"
       "d /data/photos 0750 immich immich -"
       "d /data/obsidian 0775 nginx nginx -"
+      "d /data/tdarr_cache 0755 tdarr tdarr -"
     ];
 
     services = {
-      setup-storage-permissions = {
-        description = "Setup proper storage permissions";
+      setup-storage-symlinks = {
+        description = "Create convenience symlinks in home directory";
         after = ["local-fs.target"];
         wantedBy = ["multi-user.target"];
         serviceConfig = {
@@ -87,7 +92,6 @@
           RemainAfterExit = true;
         };
         script = ''
-          # Symlinks (always)
           ln -sfn /data/media/movies /home/nixos/movies
           ln -sfn /data/media/tv /home/nixos/tv
           ln -sfn /data/media /home/nixos/media
@@ -97,45 +101,69 @@
           ln -sfn /data/obsidian /home/nixos/obsidian
           ln -sfn /data /home/nixos/data
           chown -h nixos:users /home/nixos/data
+        '';
+      };
 
-          # Heavy operations - only run once (bump version to re-run)
-          MARKER="/data/.permissions_fixed_v3"
-          if [ -f "$MARKER" ]; then
-            echo "Permissions already set, skipping."
-            exit 0
-          fi
+      setup-media-acls = {
+        description = "Ensure correct ACLs on storage directories";
+        after = ["local-fs.target"];
+        wantedBy = ["multi-user.target"];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+        };
+        script = let
+          setfacl = "${pkgs.acl}/bin/setfacl";
+          mediaGroup = constants.mediaGroup.name;
+        in ''
+          echo "Setting up media directory permissions..."
 
-          echo "Running full permission setup..."
+          # Ensure base ownership and setgid on media directories
+          chown root:${mediaGroup} /data/media
+          find /data/media -type d -exec chmod 2775 {} +
+          find /data/media -type f ! -perm 664 -exec chmod 664 {} +
 
-          # Media
-          chown -R root:${constants.mediaGroup.name} /data/media
-          find /data/media -type d -exec chmod 2775 {} \;
-          find /data/media -type f -exec chmod 664 {} \;
-          ${pkgs.acl}/bin/setfacl -R -d -m g:${constants.mediaGroup.name}:rwx /data/media
-          ${pkgs.acl}/bin/setfacl -R -m g:${constants.mediaGroup.name}:rwx /data/media
+          # Default ACL: media group gets rwx on all new files/dirs
+          ${setfacl} -R -d -m g:${mediaGroup}:rwx /data/media
+          # Existing ACL: media group gets rwx on all current files/dirs
+          ${setfacl} -R -m g:${mediaGroup}:rwx /data/media
 
-          # Shelfarr runs as UID 1000 inside its container - grant write access
-          ${pkgs.acl}/bin/setfacl -R -m u:1000:rwx /data/media/audiobooks /data/media/books /data/media/downloads/shelfarr
-          ${pkgs.acl}/bin/setfacl -R -d -m u:1000:rwx /data/media/audiobooks /data/media/books /data/media/downloads/shelfarr
+          # Per-service user ACLs for containers whose stepped-down
+          # process may not have media group membership
+          # qBittorrent (UID ${toString constants.services.qbittorrent.uid})
+          ${setfacl} -R -m u:qbittorrent:rwx /data/media/downloads
+          ${setfacl} -R -d -m u:qbittorrent:rwx /data/media/downloads
 
-          # qBittorrent runs as UID 988 inside its container without media group membership
-          ${pkgs.acl}/bin/setfacl -R -m u:qbittorrent:rwx /data/media/downloads
-          ${pkgs.acl}/bin/setfacl -R -d -m u:qbittorrent:rwx /data/media/downloads
+          # Shelfarr (UID ${toString constants.services.shelfarr.uid})
+          ${setfacl} -R -m u:shelfarr:rwx /data/media/audiobooks /data/media/books /data/media/downloads/shelfarr
+          ${setfacl} -R -d -m u:shelfarr:rwx /data/media/audiobooks /data/media/books /data/media/downloads/shelfarr
 
-          # Photos
+          # Tdarr (UID ${toString constants.services.tdarr.uid}) - needs media read/write for transcoding
+          ${setfacl} -R -m u:tdarr:rwx /data/media/movies /data/media/tv
+          ${setfacl} -R -d -m u:tdarr:rwx /data/media/movies /data/media/tv
+
+          # Unpackerr (UID 1001) - needs write access to downloads for extraction
+          ${setfacl} -R -m u:unpackerr:rwx /data/media/downloads
+          ${setfacl} -R -d -m u:unpackerr:rwx /data/media/downloads
+
+          echo "Setting up photos directory permissions..."
           chown -R immich:immich /data/photos
-          find /data/photos -type d -exec chmod 750 {} \;
-          find /data/photos -type f -exec chmod 640 {} \;
+          find /data/photos -type d -exec chmod 750 {} +
+          find /data/photos -type f ! -perm 640 -exec chmod 640 {} +
 
-          # Obsidian
+          echo "Setting up obsidian directory permissions..."
           chown -R nginx:nginx /data/obsidian
           chmod -R 755 /data/obsidian
-          ${pkgs.acl}/bin/setfacl -R -m u:nixos:rwx /data/obsidian
-          ${pkgs.acl}/bin/setfacl -R -d -m u:nixos:rwx /data/obsidian
-          ${pkgs.acl}/bin/setfacl -R -d -m u:nginx:rwx /data/obsidian
+          ${setfacl} -R -m u:nixos:rwx /data/obsidian
+          ${setfacl} -R -d -m u:nixos:rwx /data/obsidian
+          ${setfacl} -R -d -m u:nginx:rwx /data/obsidian
 
-          touch "$MARKER"
-          echo "Done."
+          # Fix ownership of shelfarr and tdarr data dirs
+          # (previously these containers ran as UID 1000)
+          chown -R shelfarr:shelfarr /var/lib/shelfarr/data 2>/dev/null || true
+          chown -R tdarr:tdarr /var/lib/tdarr 2>/dev/null || true
+
+          echo "ACL setup complete."
         '';
       };
 
@@ -149,6 +177,15 @@
     };
 
     timers = {
+      setup-media-acls = {
+        description = "Weekly ACL maintenance on storage directories";
+        wantedBy = ["timers.target"];
+        timerConfig = {
+          OnCalendar = "Wed 03:00";
+          Persistent = true;
+        };
+      };
+
       btrfs-scrub = {
         description = "Monthly Btrfs scrub";
         wantedBy = ["timers.target"];

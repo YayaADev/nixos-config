@@ -11,13 +11,6 @@
   qbtGroup = "qbittorrent";
 in {
   virtualisation.podman.enable = true;
-  users.users.${qbtUser} = {
-    isSystemUser = true;
-    group = qbtGroup;
-    home = "/var/lib/${qbtUser}";
-    createHome = true;
-    extraGroups = ["media"];
-  };
 
   systemd = {
     tmpfiles.rules = [
@@ -25,8 +18,6 @@ in {
       "d /var/lib/${qbtUser} 0750 ${qbtUser} ${qbtGroup} -"
       "d /var/lib/${qbtUser}/qBittorrent 0750 ${qbtUser} ${qbtGroup} -"
       "d /var/lib/${qbtUser}/qBittorrent/config 0750 ${qbtUser} ${qbtGroup} -"
-
-      "Z /data/media 0775 root media -"
     ];
 
     services.mam-dynamic-seedbox = {
@@ -202,8 +193,8 @@ in {
         QBT_LEGAL_NOTICE = "confirm";
         QBT_VERSION = "latest";
         QBT_WEBUI_PORT = toString serviceConfig.port;
-        PUID = "988";
-        PGID = "983";
+        PUID = toString serviceConfig.uid;
+        PGID = toString serviceConfig.gid;
         TZ = config.time.timeZone;
       };
     };

@@ -7,19 +7,9 @@
   audiobookshelfCfg = constants.services.audiobookshelf;
   hostIP = constants.network.staticIP;
 in {
-  users.users.shelfarr = {
-    isSystemUser = true;
-    group = "shelfarr";
-    home = cfg.homeDir;
-    createHome = true;
-    extraGroups = ["media"];
-  };
-
-  users.groups.shelfarr = {};
-
   systemd.tmpfiles.rules = [
     "d ${cfg.homeDir} 0755 shelfarr shelfarr -"
-    "d ${cfg.homeDir}/data 0770 1000 1000 -"
+    "d ${cfg.homeDir}/data 0770 shelfarr shelfarr -"
   ];
 
   virtualisation.oci-containers.containers.shelfarr = {
@@ -30,8 +20,8 @@ in {
       TZ = config.time.timeZone;
       HTTP_PORT = "8080";
       SOLID_QUEUE_IN_PUMA = "1";
-      PUID = "1000";
-      PGID = "1000";
+      PUID = toString cfg.uid;
+      PGID = toString constants.mediaGroup.gid;
       ABR_DRY_RUN = "0";
       ABR_BACKUP = "1";
       ABR_FILENAME_TEMPLATE = "{author}/{title}";

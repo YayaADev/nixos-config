@@ -114,6 +114,8 @@
       hostname = "qbittorrent.home";
       description = "qBittorrent BitTorrent Client";
       systemUser = true;
+      uid = 988;
+      gid = 983;
       extraGroups = [
         "users"
         "media"
@@ -133,6 +135,8 @@
       hostname = "tdarr.home";
       description = "Tdarr Media Transcoding";
       systemUser = true;
+      uid = 972;
+      gid = 965;
       extraGroups = [
         "video"
         "render"
@@ -146,6 +150,8 @@
       hostname = "shelfarr.home";
       description = "Shelfarr Book Request Management";
       systemUser = true;
+      uid = 973;
+      gid = 966;
       extraGroups = [
         "users"
         "media"
@@ -169,6 +175,7 @@
 
   mediaGroup = {
     name = "media";
+    gid = 980;
   };
 in {
   network = {

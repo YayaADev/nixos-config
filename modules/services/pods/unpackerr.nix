@@ -38,7 +38,7 @@
       # Radarr
       UN_RADARR_0_URL = "http://radarr.home:${toString constants.services.radarr.port}";
       UN_RADARR_0_API_KEY = envVars.radarr.apiKey;
-      UN_RADARR_0_PATHS_0 = "/data/torrents";
+      UN_RADARR_0_PATHS_0 = "/data/media/downloads";
       UN_RADARR_0_PROTOCOLS = "torrent";
       UN_RADARR_0_DELETE_ORIG = "false";
       UN_RADARR_0_DELETE_DELAY = "5m";
@@ -46,14 +46,14 @@
       # Sonarr
       UN_SONARR_0_URL = "http://sonarr.home:${toString constants.services.sonarr.port}";
       UN_SONARR_0_API_KEY = envVars.sonarr.apiKey;
-      UN_SONARR_0_PATHS_0 = "/data/torrents";
+      UN_SONARR_0_PATHS_0 = "/data/media/downloads";
       UN_SONARR_0_PROTOCOLS = "torrent";
       UN_SONARR_0_DELETE_ORIG = "false";
       UN_SONARR_0_DELETE_DELAY = "5m";
     };
 
     volumes = [
-      "/data/torrents:/data/torrents"
+      "/data/media/downloads:/data/media/downloads"
     ];
 
     extraOptions = [

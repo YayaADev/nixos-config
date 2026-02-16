@@ -14,12 +14,19 @@
         group = serviceName;
         extraGroups = serviceConfig.extraGroups or [];
       }
+      // lib.optionalAttrs (serviceConfig ? uid) {
+        inherit (serviceConfig) uid;
+      }
       // lib.optionalAttrs (serviceConfig.createHome or false) {
         home = lib.mkForce (serviceConfig.homeDir or "/var/lib/${serviceName}");
         createHome = true;
       };
 
-    groups.${serviceName} = {};
+    groups.${serviceName} =
+      {}
+      // lib.optionalAttrs (serviceConfig ? gid) {
+        inherit (serviceConfig) gid;
+      };
   };
 
   # Generate users and groups for all system services
@@ -61,7 +68,9 @@ in {
     systemServiceUsers.groups
     // {
       # Create the media group
-      ${constants.mediaGroup.name} = {};
+      ${constants.mediaGroup.name} = {
+        inherit (constants.mediaGroup) gid;
+      };
     };
 
   # Security settings

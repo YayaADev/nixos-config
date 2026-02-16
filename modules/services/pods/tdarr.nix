@@ -7,19 +7,6 @@
   tdarrUser = "tdarr";
   tdarrGroup = "tdarr";
 in {
-  users.users.${tdarrUser} = {
-    isSystemUser = true;
-    group = tdarrGroup;
-    home = "/var/lib/${tdarrUser}";
-    createHome = true;
-    extraGroups = [
-      "video"
-      "render"
-      "media"
-    ];
-  };
-  users.groups.${tdarrGroup} = {};
-
   systemd.tmpfiles.rules = [
     "d /var/lib/${tdarrUser} 0755 ${tdarrUser} ${tdarrGroup} -"
     "d /var/lib/${tdarrUser}/server 0755 ${tdarrUser} ${tdarrGroup} -"
@@ -33,8 +20,8 @@ in {
     autoStart = true;
     environment = {
       TZ = config.time.timeZone;
-      PUID = "1000";
-      PGID = "980";
+      PUID = toString serviceConfig.uid;
+      PGID = toString constants.mediaGroup.gid;
       serverIP = "0.0.0.0";
       serverPort = toString serviceConfig.serverPort;
       webUIPort = toString serviceConfig.port;
