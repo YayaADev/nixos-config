@@ -43,6 +43,10 @@ in {
     arp-scan
     dig
     claude-code
+    nixd
+    deadnix
+    statix
+    pre-commit
   ];
 
   nix = {
@@ -63,7 +67,7 @@ in {
 
     distributedBuilds = true;
 
-    # Offload builds to x86 PC — kernel compilation is slow on the SBC
+    # Offload builds to x86 PC — kernel compilation takes too much storage on SBC
     buildMachines = [
       {
         hostName = "builder";

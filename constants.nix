@@ -171,6 +171,12 @@
       createHome = true;
       homeDir = "/var/lib/audiobookshelf";
     };
+    blog = {
+      port = 8585;
+      hostname = "blog.home";
+      description = "Quartz Static Blog";
+      systemUser = false;
+    };
   };
 
   mediaGroup = {

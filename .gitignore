@@ -9,3 +9,4 @@ envVars.nix
 .vscode/
 nix/
 CLAUDE.md
+.claude

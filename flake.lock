@@ -68,11 +68,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1770947121,
-        "narHash": "sha256-eLRoxf0+/YlGkenjkB7HD0O/t93/G7J/172UZiy3d2o=",
+        "lastModified": 1771227633,
+        "narHash": "sha256-uUZMqpQ+Hv4CzwWSZeLpdPEth0W2+d0MlnZb073XjwY=",
         "owner": "YayaADev",
         "repo": "nixos-friendlyelec-cm3588",
-        "rev": "ef6542dd5a76d90ffd4da5ac32e37755a654817a",
+        "rev": "687a43f7a8961d7929e82494cfeb55c031638192",
         "type": "github"
       },
       "original": {

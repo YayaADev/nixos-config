@@ -88,7 +88,7 @@
     ];
   };
 
-  # Create WebDAV temp directory and set permissions
+  # Create WebDAV temp directory
   systemd.tmpfiles.rules = [
     "d /tmp/nginx_webdav_temp 0755 nginx nginx -"
   ];
