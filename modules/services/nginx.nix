@@ -24,6 +24,9 @@
       # Prevents 400 Bad Request on Sonarr/Radarr/Jellyfin due to large cookies
       large_client_header_buffers 4 16k;
 
+      # Rate limiting zone for WebDAV brute-force protection (10 req/s per IP)
+      limit_req_zone $binary_remote_addr zone=webdav_limit:10m rate=10r/s;
+
       # WebDAV specific settings
       client_body_temp_path /tmp/nginx_webdav_temp;
       dav_access user:rw group:rw all:r;
@@ -47,6 +50,10 @@
           locations."/" = {
             root = "/data/obsidian";
             extraConfig = ''
+              # Rate limit: 10 req/s sustained, burst up to 50 without delay
+              limit_req zone=webdav_limit burst=50 nodelay;
+              limit_req_status 429;
+
               # HTTP Basic Auth
               auth_basic "Obsidian WebDAV";
               auth_basic_user_file ${config.age.secrets.webdav-htpasswd.path};

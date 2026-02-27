@@ -76,7 +76,8 @@
       "d /data/media/downloads 2775 root ${constants.mediaGroup.name} -"
       "d /data/media/downloads/movies 2775 qbittorrent ${constants.mediaGroup.name} -"
       "d /data/media/downloads/tv 2775 qbittorrent ${constants.mediaGroup.name} -"
-      "d /data/media/downloads/shelfarr 2775 shelfarr ${constants.mediaGroup.name} -"
+
+      "d /data/media/downloads/chaptarr 2775 root ${constants.mediaGroup.name} -"
       "d /data/photos 0750 immich immich -"
       "d /data/obsidian 0775 nginx nginx -"
       "d /data/tdarr_cache 0755 tdarr tdarr -"
@@ -134,10 +135,6 @@
           ${setfacl} -R -m u:qbittorrent:rwx /data/media/downloads
           ${setfacl} -R -d -m u:qbittorrent:rwx /data/media/downloads
 
-          # Shelfarr (UID ${toString constants.services.shelfarr.uid})
-          ${setfacl} -R -m u:shelfarr:rwx /data/media/audiobooks /data/media/books /data/media/downloads/shelfarr
-          ${setfacl} -R -d -m u:shelfarr:rwx /data/media/audiobooks /data/media/books /data/media/downloads/shelfarr
-
           # Tdarr (UID ${toString constants.services.tdarr.uid}) - needs media read/write for transcoding
           ${setfacl} -R -m u:tdarr:rwx /data/media/movies /data/media/tv
           ${setfacl} -R -d -m u:tdarr:rwx /data/media/movies /data/media/tv
@@ -158,9 +155,8 @@
           ${setfacl} -R -d -m u:nixos:rwx /data/obsidian
           ${setfacl} -R -d -m u:nginx:rwx /data/obsidian
 
-          # Fix ownership of shelfarr and tdarr data dirs
+          # Fix ownership of tdarr data dirs
           # (previously these containers ran as UID 1000)
-          chown -R shelfarr:shelfarr /var/lib/shelfarr/data 2>/dev/null || true
           chown -R tdarr:tdarr /var/lib/tdarr 2>/dev/null || true
 
           echo "ACL setup complete."

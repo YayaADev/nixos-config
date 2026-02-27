@@ -145,20 +145,6 @@
       createHome = true;
       homeDir = "/var/lib/tdarr";
     };
-    shelfarr = {
-      port = 5056;
-      hostname = "shelfarr.home";
-      description = "Shelfarr Book Request Management";
-      systemUser = true;
-      uid = 973;
-      gid = 966;
-      extraGroups = [
-        "users"
-        "media"
-      ];
-      createHome = true;
-      homeDir = "/var/lib/shelfarr";
-    };
     audiobookshelf = {
       port = 13378;
       hostname = "audiobookshelf.home";
@@ -175,6 +161,12 @@
       port = 8585;
       hostname = "blog.home";
       description = "Quartz Static Blog";
+      systemUser = false;
+    };
+    chaptarr = {
+      port = 8789;
+      hostname = "chaptarr.home";
+      description = "Chaptarr Ebook Manager";
       systemUser = false;
     };
   };
