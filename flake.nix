@@ -18,11 +18,6 @@
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    pre-commit-hooks = {
-      url = "github:cachix/pre-commit-hooks.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs = inputs @ {
@@ -31,7 +26,6 @@
     friendlyelecCM3588,
     agenix,
     treefmt-nix,
-    pre-commit-hooks,
     ...
   }: let
     targetSystem = "aarch64-linux";
@@ -82,52 +76,20 @@
     formatter = forDevSystems (system: treefmtEval.${system}.config.build.wrapper);
 
     checks = forDevSystems (system: {
-      # `nix check`
       formatting = treefmtEval.${system}.config.build.check self;
-
-      pre-commit-check = pre-commit-hooks.lib.${system}.run {
-        src = ./.;
-        hooks = {
-          # Auto-formats .nix files in place
-          alejandra.enable = true;
-
-          # Auto-removes dead bindings in place
-          deadnix = {
-            enable = true;
-            settings = {
-              edit = true; # modify files in place
-              noLambdaArg = true;
-            };
-          };
-
-          # Auto-fixes Nix anti-patterns in place
-          statix = {
-            enable = true;
-            entry = "${(pkgsFor system).statix}/bin/statix fix";
-            pass_filenames = false; # statix fix operates on the whole project at once
-          };
-        };
-      };
     });
 
-    # `nix develop` on either machine installs git pre-commit hooks
     devShells = forDevSystems (
       system: let
         pkgs = pkgsFor system;
       in {
         default = pkgs.mkShell {
-          # Run pre-commit setup, then hand off to zsh (kitty/oh-my-zsh config intact)
-          shellHook = ''
-            ${self.checks.${system}.pre-commit-check.shellHook}
-            exec ${pkgs.zsh}/bin/zsh
-          '';
-
           packages = with pkgs; [
-            alejandra # formatter   — also run manually: `alejandra .`
-            deadnix # dead code    — also run manually: `deadnix -e .`
-            statix # linter        — also run manually: `statix check .`
-            nixd # Nix LSP
-            agenix.packages.${system}.agenix # agenix CLI for secrets
+            alejandra
+            deadnix
+            statix
+            nixd
+            agenix.packages.${system}.agenix
           ];
         };
       }

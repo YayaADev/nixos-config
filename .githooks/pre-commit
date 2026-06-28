@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Runs linters/fixers on staged .nix files before commit.
+# Tools resolve from PATH — no hardcoded store paths.
+
+staged_nix=$(git diff --cached --name-only --diff-filter=ACM | grep "\.nix$")
+[ -z "$staged_nix" ] && exit 0
+
+# Format
+echo "$staged_nix" | xargs alejandra --quiet
+# Remove dead code
+echo "$staged_nix" | xargs deadnix --no-lambda-arg --edit --fail || exit 1
+# Lint + fix anti-patterns
+statix fix || exit 1
+
+# Re-stage any auto-fixed files
+echo "$staged_nix" | xargs git add
