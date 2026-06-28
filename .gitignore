@@ -1,6 +1,7 @@
 # Build results
 result*
 secrets
+
 # Secrets and authentication
 *.age
 envVars.nix
@@ -8,6 +9,9 @@ envVars.nix
 # Development tools
 .vscode/
 nix/
-CLAUDE.md
-.claude
 learnings
+
+# Claude Code (keep rules and CLAUDE.md tracked, ignore local state)
+.claude/settings.local.json
+.claude/sessions/
+.claude/cache/
