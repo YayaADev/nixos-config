@@ -28,6 +28,18 @@
       ];
     };
 
+    "/var/lib" = {
+      device = "/dev/disk/by-label/data";
+      fsType = "btrfs";
+      options = [
+        "compress=zstd:3"
+        "space_cache=v2"
+        "noatime"
+        "subvol=var-lib"
+      ];
+      depends = ["/data"];
+    };
+
     "/data/media" = {
       device = "/dev/disk/by-label/data";
       fsType = "btrfs";
@@ -77,10 +89,13 @@
       "d /data/media/downloads/movies 2775 qbittorrent ${constants.mediaGroup.name} -"
       "d /data/media/downloads/tv 2775 qbittorrent ${constants.mediaGroup.name} -"
 
-      "d /data/media/downloads/chaptarr 2775 root ${constants.mediaGroup.name} -"
+      "d /data/media/downloads/chaptarr-ebooks 2775 root ${constants.mediaGroup.name} -"
+      "d /data/media/downloads/chaptarr-audiobooks 2775 root ${constants.mediaGroup.name} -"
       "d /data/photos 0750 immich immich -"
       "d /data/obsidian 0775 nginx nginx -"
       "d /data/tdarr_cache 0755 tdarr tdarr -"
+      # Kobo library: Syncthing (syncthing user) writes here; containers read it
+      "d /data/kobo 0755 syncthing syncthing -"
     ];
 
     services = {
@@ -143,6 +158,10 @@
           ${setfacl} -R -m u:unpackerr:rwx /data/media/downloads
           ${setfacl} -R -d -m u:unpackerr:rwx /data/media/downloads
 
+          # Chaptarr (container UID 99) - needs write access to books, audiobooks, and downloads
+          ${setfacl} -R -m u:99:rwx /data/media/books /data/media/audiobooks /data/media/downloads
+          ${setfacl} -R -d -m u:99:rwx /data/media/books /data/media/audiobooks /data/media/downloads
+
           echo "Setting up photos directory permissions..."
           chown -R immich:immich /data/photos
           find /data/photos -type d -exec chmod 750 {} +
@@ -154,6 +173,17 @@
           ${setfacl} -R -m u:nixos:rwx /data/obsidian
           ${setfacl} -R -d -m u:nixos:rwx /data/obsidian
           ${setfacl} -R -d -m u:nginx:rwx /data/obsidian
+
+          echo "Setting up kobo directory permissions..."
+          # /data/kobo is owned by the syncthing user (Syncthing writes here).
+          # Guard with -d: the directory may not exist yet if Syncthing has
+          # never started (tmpfiles for it runs on first activation).
+          if [ -d /data/kobo ]; then
+            chown syncthing:syncthing /data/kobo 2>/dev/null || true
+            chmod 755 /data/kobo
+          else
+            echo "/data/kobo not yet created, skipping (will be set on next run)"
+          fi
 
           # Fix ownership of tdarr data dirs
           # (previously these containers ran as UID 1000)

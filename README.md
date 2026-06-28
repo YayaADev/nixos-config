@@ -6,8 +6,8 @@ My NixOS configuration for a home server running on FriendlyElec CM3588+ SBC.
 
 Self-hosted media and services infrastructure on FriendlyElec CM3588+ with Podman containerization.
 
-- **Media Management**: Complete *arr stack (Sonarr, Radarr, Prowlarr, Bazarr) + Jellyfin media server
-- **Request Management**: Jellyseerr (TV/movies), Shelfarr (books/audiobooks)
+- **Media Management**: Complete *arr stack (Sonarr, Radarr, Chaptarr, Prowlarr, Bazarr) + Jellyfin media server
+- **Request Management**: Jellyseerr (TV/movies)
 - **Network Services**: DNS filtering (AdGuard), reverse proxy (Nginx), VPN (Tailscale, Cloudflare)
 - **Storage**: Btrfs RAID1 across 3 NVMe SSDs (~3.6TB usable)
 - **Containerization**: Podman infrastructure with auto-update timers
@@ -30,6 +30,7 @@ Self-hosted media and services infrastructure on FriendlyElec CM3588+ with Podma
 | **Jellyseerr** | 5055 | `jellyseerr.home` | Media request management |
 | **Sonarr** | 8989 | `sonarr.home` | TV series management |
 | **Radarr** | 7878 | `radarr.home` | Movie management |
+| **Chaptarr** | 8789 | `chaptarr.home` | Ebook/audiobook management (Readarr fork) |
 | **Prowlarr** | 9696 | `prowlarr.home` | Indexer management |
 | **Bazarr** | 6767 | `bazarr.home` | Subtitle management |
 | **qBittorrent** | 8090 | `qbittorrent.home` | Torrent client (VPN via Gluetun, auto port-forward) |
@@ -39,14 +40,15 @@ Self-hosted media and services infrastructure on FriendlyElec CM3588+ with Podma
 | Service | Port | Internal URL | Purpose | Type |
 |---------|------|--------------|---------|------|
 | **Immich** | 3001 | `immich.home` | Photo management with AI | Podman |
-| **Shelfarr** | 5056 | `shelfarr.home` | Book/audiobook request management | Podman |
 | **Tdarr** | 8265 | `tdarr.home` | Media transcoding (GPU-accelerated) | Podman |
 | **Unpackerr** | - | - | Archive extraction & import automation | Podman |
 | **Gluetun** | 8000 | - | VPN tunnel (ProtonVPN) for qBittorrent | Podman |
-| **WebDAV** | 8080 | `webdav.home` | Obsidian sync server | Native |
+| **WebDAV** | 8080 | `webdav.home` | Obsidian sync (HTTP Basic Auth, HTTPS via Cloudflare) | Native |
 | **FlareSolverr** | 8191 | `flaresolverr.home` | Cloudflare bypass | Native |
 | **Samba** | 445 | - | SMB file sharing | Native |
-| **WebDAV** | 8080 | `webdav.home` | Obsidian sync (HTTP Basic Auth, HTTPS via Cloudflare) | Native |
+| **KoInsight** | 3002 | `koinsight.home` | KOReader reading stats + kosync position-sync server | Podman |
+| **KoShelf** | 3003 | `koshelf.home` | KOReader highlights/annotations dashboard | Podman |
+| **Syncthing** | 8384 | `syncthing.home` | Kobo ↔ NAS file sync (books + .sdr sidecars) | Native |
 
 ### Network & Security
 - **Tailscale**: VPN with subnet routing and exit node
@@ -79,9 +81,10 @@ Self-hosted media and services infrastructure on FriendlyElec CM3588+ with Podma
 ### Media Download Layout
 ```
 /data/media/downloads/
-  movies/        # qBittorrent staging → Radarr hardlinks to /data/media/movies
-  tv/            # qBittorrent staging → Sonarr hardlinks to /data/media/tv
-  shelfarr/      # Shelfarr downloads for books & audiobooks
+  movies/              # qBittorrent staging → Radarr hardlinks to /data/media/movies
+  tv/                  # qBittorrent staging → Sonarr hardlinks to /data/media/tv
+  chaptarr-ebooks/     # qBittorrent staging → Chaptarr hardlinks to /data/media/books
+  chaptarr-audiobooks/ # qBittorrent staging → Chaptarr hardlinks to /data/media/audiobooks
 ```
 
 ### Automatic Maintenance
@@ -161,6 +164,7 @@ systemctl status --all
 All services available via `.home` domains:
 - http://jellyfin.home
 - http://jellyseerr.home
+- http://chaptarr.home
 - http://adguard.home
 - http://webdav.home:8080 (requires Basic Auth)
 - etc.

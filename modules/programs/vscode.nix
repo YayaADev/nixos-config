@@ -11,7 +11,7 @@
       curl
       openssl
       gitMinimal
-      nodejs_20
+      nodejs_22
       python3
       zlib
       krb5
@@ -35,7 +35,7 @@
           )
         }
 
-        nodePath="${pkgs.nodejs_20}/bin/node"
+        nodePath="${pkgs.nodejs_22}/bin/node"
         bin_dir="$HOME/.vscode-server/bin"
 
         [[ -e "$bin_dir" ]] && \

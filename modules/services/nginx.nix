@@ -50,10 +50,6 @@
           locations."/" = {
             root = "/data/obsidian";
             extraConfig = ''
-              # Rate limit: 10 req/s sustained, burst up to 50 without delay
-              limit_req zone=webdav_limit burst=50 nodelay;
-              limit_req_status 429;
-
               # HTTP Basic Auth
               auth_basic "Obsidian WebDAV";
               auth_basic_user_file ${config.age.secrets.webdav-htpasswd.path};

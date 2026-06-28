@@ -19,10 +19,10 @@
 
     shellAliases = {
       # NixOS specific
-      rebuild = "sudo nixos-rebuild switch --flake /home/nixos/nixos-config --impure";
-      rebuild-test = "sudo nixos-rebuild test --flake /home/nixos/nixos-config --impure";
-      rebuild-boot = "sudo nixos-rebuild boot --flake /home/nixos/nixos-config --impure";
-      rebuild-dry = "nixos-rebuild build --flake /home/nixos/nixos-config --dry-run --impure";
+      rebuild = "sudo nixos-rebuild switch --flake /home/nixos/nixos-config --impure --option builders ''";
+      rebuild-test = "sudo nixos-rebuild test --flake /home/nixos/nixos-config --impure --option builders ''";
+      rebuild-boot = "sudo nixos-rebuild boot --flake /home/nixos/nixos-config --impure --option builders ''";
+      rebuild-dry = "nixos-rebuild build --flake /home/nixos/nixos-config --dry-run --impure --option builders ''";
 
       # Remote builds (on x86 Ryzen 9)
       rebuild-remote = "sudo nixos-rebuild switch --flake /home/nixos/nixos-config --impure --max-jobs 0";
@@ -42,6 +42,7 @@
       la = "eza -a";
       tree = "eza --tree";
       cat = "bat";
+      c = "clear";
 
       # Navigation
       ".." = "cd ..";
@@ -53,6 +54,9 @@
       df = "df -h";
       du = "du -h";
       free = "free -h";
+      f = "fd";
+      r = "rg";
+      hs = "atuin search -i";
 
       # System monitoring
       ports = "netstat -tuln";
@@ -62,6 +66,11 @@
       # Git
       gs = "git status";
       glog = "git log --oneline --graph --decorate";
+      gst = "git status -sb";
+      ga = "git add";
+      gd = "git diff";
+      gco = "git checkout";
+      gl = "git log --oneline --graph --decorate --all";
 
       # Storage
       btrfs-usage = "sudo btrfs filesystem usage /data";
@@ -91,9 +100,38 @@
       setopt HIST_IGNORE_SPACE
 
       # Completion
-      autoload -Uz compinit
-      compinit
       zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+
+      # QoL tools
+      has() {
+          command -v "$1" &>/dev/null
+      }
+
+      if [[ -o interactive ]]; then
+          if has fzf; then
+              source <(fzf --zsh)
+
+              if has fd; then
+                  export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix'
+                  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+                  export FZF_ALT_C_COMMAND='fd --type d --strip-cwd-prefix'
+              fi
+
+              export FZF_DEFAULT_OPTS='--height=40% --layout=reverse --border'
+          fi
+
+          if has zoxide; then
+              eval "$(zoxide init zsh)"
+          fi
+
+          if has atuin; then
+              eval "$(atuin init zsh --disable-up-arrow)"
+          fi
+
+          if has starship; then
+              eval "$(starship init zsh)"
+          fi
+      fi
 
       # Functions
       sysinfo() {
@@ -110,31 +148,22 @@
           echo "NixOS: $(nixos-version)"
       }
 
-      cd() {
-          builtin cd "$@"
-          if command -v eza &> /dev/null; then
-              eza -la
-          else
-              ls -la
-          fi
-      }
-
       # Welcome message
-      if [[ -o interactive ]]; then
+      if [[ -o interactive && -o login ]]; then
           echo "Welcome to NixOS on $(hostname)!"
-          if command -v neofetch &> /dev/null; then
-              neofetch
-          else
-              sysinfo
-          fi
       fi
     '';
   };
 
-  # eza, bat, neofetch are used directly by the shell config above
   environment.systemPackages = with pkgs; [
     eza
     bat
-    neofetch
+    fastfetch
+    fd
+    ripgrep
+    fzf
+    zoxide
+    atuin
+    starship
   ];
 }

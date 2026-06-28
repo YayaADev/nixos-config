@@ -169,6 +169,24 @@
       description = "Chaptarr Ebook Manager";
       systemUser = false;
     };
+    koshelf = {
+      port = 3004;
+      hostname = "koshelf.home";
+      description = "KoShelf KOReader Highlights Dashboard";
+      systemUser = false;
+    };
+    koinsight = {
+      port = 3002;
+      hostname = "koinsight.home";
+      description = "KoInsight Reading Stats + KOSync Position Sync";
+      systemUser = false;
+    };
+    syncthing = {
+      port = 8384;
+      hostname = "syncthing.home";
+      description = "Syncthing File Sync (Kobo ↔ NAS)";
+      systemUser = false;
+    };
   };
 
   mediaGroup = {

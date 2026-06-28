@@ -15,11 +15,7 @@ in {
   services.postgresql = {
     enable = true;
     package = pkgs.postgresql_16;
-    extensions = ps: [
-      ps.pgvecto-rs
-    ];
     settings = {
-      shared_preload_libraries = "vectors";
       listen_addresses = lib.mkForce "*";
       port = 5432;
     };
@@ -29,9 +25,14 @@ in {
     image = "ghcr.io/immich-app/immich-machine-learning:release-rknn";
     autoStart = true;
 
+    ports = [
+      "127.0.0.1:3003:3003"
+    ];
+
     environment = {
       TZ = config.time.timeZone;
-      MACHINE_LEARNING_RKNN_THREADS = "3";
+      MACHINE_LEARNING_RKNN_THREADS = "2";
+      MACHINE_LEARNING_REQUEST_THREADS = "1";
     };
 
     volumes = [
@@ -109,7 +110,7 @@ in {
           concurrency = 5;
         };
         smartSearch = {
-          concurrency = 4;
+          concurrency = 3;
         };
         metadataExtraction = {
           concurrency = 5;
@@ -176,6 +177,11 @@ in {
   ];
 
   # Server needs device access for transcoding
+  systemd.services.immich-server = {
+    after = ["podman-immich-ml-rknn.service"];
+    wants = ["podman-immich-ml-rknn.service"];
+  };
+
   systemd.services.immich-server.serviceConfig = {
     PrivateDevices = lib.mkForce false;
     DeviceAllow = [

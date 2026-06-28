@@ -15,6 +15,14 @@ in {
 
   nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) ["netdata"];
 
+  nixpkgs.overlays = [
+    (final: prev: {
+      claude-code = prev.claude-code.overrideAttrs (old: {
+        nativeBuildInputs = (old.nativeBuildInputs or []) ++ [prev.python3Packages.pyelftools];
+      });
+    })
+  ];
+
   programs.git.enable = true;
 
   environment.systemPackages = with pkgs; [
@@ -47,6 +55,10 @@ in {
     deadnix
     statix
     pre-commit
+    opencode
+    eza
+    bat
+    fastfetch
   ];
 
   nix = {

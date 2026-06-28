@@ -7,8 +7,8 @@
   hostIP = constants.network.staticIP;
 in {
   systemd.tmpfiles.rules = [
-    "d /var/lib/chaptarr 0755 root root -"
-    "d /var/lib/chaptarr/config 0755 root root -"
+    "d /var/lib/chaptarr 0755 99 100 -"
+    "d /var/lib/chaptarr/config 0755 99 100 -"
   ];
 
   virtualisation.oci-containers.containers.chaptarr = {
@@ -23,8 +23,7 @@ in {
 
     volumes = [
       "/var/lib/chaptarr/config:/config"
-      "/data/media/books:/books"
-      "/data/media/downloads/chaptarr:/downloads"
+      "/data/media:/data/media"
     ];
 
     extraOptions = [

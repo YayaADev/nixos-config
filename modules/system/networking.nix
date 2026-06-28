@@ -10,6 +10,9 @@
     };
   };
 
+  # Disable resolvconf — we manage /etc/resolv.conf directly below
+  networking.resolvconf.enable = false;
+
   # This guarantees /etc/resolv.conf exists and points to AdGuard (localhost)
   environment.etc."resolv.conf".text = ''
     nameserver 127.0.0.1
