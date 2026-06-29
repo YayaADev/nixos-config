@@ -51,13 +51,7 @@
       port = 5055;
       hostname = "jellyseerr.home";
       description = "Jellyseerr Media Request Management";
-      systemUser = true;
-      extraGroups = [
-        "users"
-        "media"
-      ];
-      createHome = true;
-      homeDir = "/var/lib/jellyseerr";
+      systemUser = false;
     };
     sonarr = {
       port = 8989;
@@ -181,6 +175,13 @@
       description = "KoInsight Reading Stats + KOSync Position Sync";
       systemUser = false;
     };
+    unpackerr = {
+      description = "Unpackerr Archive Extraction";
+      systemUser = true;
+      uid = 1001;
+      gid = 1001;
+      extraGroups = ["media"];
+    };
     syncthing = {
       port = 8384;
       hostname = "syncthing.home";
@@ -205,11 +206,11 @@ in {
 
   inherit mediaGroup;
 
-  ports = lib.mapAttrs (_name: service: service.port) services;
+  ports = lib.mapAttrs (_name: service: service.port) (lib.filterAttrs (_: s: s ? port) services);
 
   nginxServices = lib.filterAttrs (_name: service: service ? hostname) services;
 
   systemServices = lib.filterAttrs (_name: service: service.systemUser or false) services;
 
-  allTcpPorts = lib.attrValues (lib.mapAttrs (_name: service: service.port) services);
+  allTcpPorts = lib.attrValues (lib.mapAttrs (_name: service: service.port) (lib.filterAttrs (_: s: s ? port) services));
 }

@@ -1,11 +1,4 @@
-{
-  pkgs,
-  lib,
-  ...
-}: {
-  nixpkgs.config.allowUnfreePredicate = pkg:
-    builtins.elem (lib.getName pkg) ["netdata"];
-
+{pkgs, ...}: {
   services.netdata = {
     enable = true;
     package = pkgs.netdata.override {withCloudUi = true;};
@@ -17,6 +10,4 @@
       };
     };
   };
-
-  networking.firewall.allowedTCPPorts = [19999];
 }

@@ -1,7 +1,4 @@
-{
-  constants,
-  ...
-}: let
+{constants, ...}: let
   cfg = constants.services.syncthing;
 in {
   services.syncthing = {

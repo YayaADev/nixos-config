@@ -46,9 +46,4 @@ in {
       "--group-add=980"
     ];
   };
-
-  services.udev.extraRules = ''
-    SUBSYSTEM=="drm", KERNEL=="renderD*", GROUP="render", MODE="0664"
-    SUBSYSTEM=="drm", KERNEL=="card*", GROUP="video", MODE="0664"
-  '';
 }

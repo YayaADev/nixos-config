@@ -30,6 +30,4 @@ in {
       "--label=io.containers.autoupdate=registry"
     ];
   };
-
-  networking.firewall.allowedTCPPorts = [cfg.port];
 }

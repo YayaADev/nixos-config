@@ -2,7 +2,9 @@
   pkgs,
   constants,
   ...
-}: {
+}: let
+  btrfsOpts = subvol: ["compress=zstd:3" "space_cache=v2" "noatime" "subvol=${subvol}"];
+in {
   boot.supportedFilesystems = ["btrfs"];
 
   environment.systemPackages = with pkgs; [
@@ -20,59 +22,34 @@
     "/data" = {
       device = "/dev/disk/by-label/data";
       fsType = "btrfs";
-      options = [
-        "compress=zstd:3"
-        "space_cache=v2"
-        "noatime"
-        "subvol=/"
-      ];
+      options = btrfsOpts "/";
     };
 
     "/var/lib" = {
       device = "/dev/disk/by-label/data";
       fsType = "btrfs";
-      options = [
-        "compress=zstd:3"
-        "space_cache=v2"
-        "noatime"
-        "subvol=var-lib"
-      ];
+      options = btrfsOpts "var-lib";
       depends = ["/data"];
     };
 
     "/data/media" = {
       device = "/dev/disk/by-label/data";
       fsType = "btrfs";
-      options = [
-        "compress=zstd:3"
-        "space_cache=v2"
-        "noatime"
-        "subvol=media"
-      ];
+      options = btrfsOpts "media";
       depends = ["/data"];
     };
 
     "/data/photos" = {
       device = "/dev/disk/by-label/data";
       fsType = "btrfs";
-      options = [
-        "compress=zstd:3"
-        "space_cache=v2"
-        "noatime"
-        "subvol=photos"
-      ];
+      options = btrfsOpts "photos";
       depends = ["/data"];
     };
 
     "/data/obsidian" = {
       device = "/dev/disk/by-label/data";
       fsType = "btrfs";
-      options = [
-        "compress=zstd:3"
-        "space_cache=v2"
-        "noatime"
-        "subvol=obsidian"
-      ];
+      options = btrfsOpts "obsidian";
       depends = ["/data"];
     };
   };
@@ -88,13 +65,11 @@
       "d /data/media/downloads 2775 root ${constants.mediaGroup.name} -"
       "d /data/media/downloads/movies 2775 qbittorrent ${constants.mediaGroup.name} -"
       "d /data/media/downloads/tv 2775 qbittorrent ${constants.mediaGroup.name} -"
-
       "d /data/media/downloads/chaptarr-ebooks 2775 root ${constants.mediaGroup.name} -"
       "d /data/media/downloads/chaptarr-audiobooks 2775 root ${constants.mediaGroup.name} -"
       "d /data/photos 0750 immich immich -"
       "d /data/obsidian 0775 nginx nginx -"
       "d /data/tdarr_cache 0755 tdarr tdarr -"
-      # Kobo library: Syncthing (syncthing user) writes here; containers read it
       "d /data/kobo 0755 syncthing syncthing -"
     ];
 
@@ -134,31 +109,24 @@
         in ''
           echo "Setting up media directory permissions..."
 
-          # Ensure base ownership and setgid on media directories
           chown root:${mediaGroup} /data/media
           find /data/media -type d -exec chmod 2775 {} +
           find /data/media -type f ! -perm 664 -exec chmod 664 {} +
 
-          # Default ACL: media group gets rwx on all new files/dirs
           ${setfacl} -R -d -m g:${mediaGroup}:rwx /data/media
-          # Existing ACL: media group gets rwx on all current files/dirs
           ${setfacl} -R -m g:${mediaGroup}:rwx /data/media
 
           # Per-service user ACLs for containers whose stepped-down
-          # process may not have media group membership
-          # qBittorrent (UID ${toString constants.services.qbittorrent.uid})
+          # process does not have media group membership
           ${setfacl} -R -m u:qbittorrent:rwx /data/media/downloads
           ${setfacl} -R -d -m u:qbittorrent:rwx /data/media/downloads
 
-          # Tdarr (UID ${toString constants.services.tdarr.uid}) - needs media read/write for transcoding
           ${setfacl} -R -m u:tdarr:rwx /data/media/movies /data/media/tv
           ${setfacl} -R -d -m u:tdarr:rwx /data/media/movies /data/media/tv
 
-          # Unpackerr (UID 1001) - needs write access to downloads for extraction
           ${setfacl} -R -m u:unpackerr:rwx /data/media/downloads
           ${setfacl} -R -d -m u:unpackerr:rwx /data/media/downloads
 
-          # Chaptarr (container UID 99) - needs write access to books, audiobooks, and downloads
           ${setfacl} -R -m u:99:rwx /data/media/books /data/media/audiobooks /data/media/downloads
           ${setfacl} -R -d -m u:99:rwx /data/media/books /data/media/audiobooks /data/media/downloads
 
@@ -175,9 +143,6 @@
           ${setfacl} -R -d -m u:nginx:rwx /data/obsidian
 
           echo "Setting up kobo directory permissions..."
-          # /data/kobo is owned by the syncthing user (Syncthing writes here).
-          # Guard with -d: the directory may not exist yet if Syncthing has
-          # never started (tmpfiles for it runs on first activation).
           if [ -d /data/kobo ]; then
             chown syncthing:syncthing /data/kobo 2>/dev/null || true
             chmod 755 /data/kobo
@@ -185,8 +150,6 @@
             echo "/data/kobo not yet created, skipping (will be set on next run)"
           fi
 
-          # Fix ownership of tdarr data dirs
-          # (previously these containers ran as UID 1000)
           chown -R tdarr:tdarr /var/lib/tdarr 2>/dev/null || true
 
           echo "ACL setup complete."

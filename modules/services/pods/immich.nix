@@ -9,8 +9,6 @@
 }: let
   serviceConfig = constants.services.immich;
 in {
-  nixpkgs.config.allowBroken = true;
-
   #  Pin to Postgres 16. An upgrade used v17 but v16 is what works here
   services.postgresql = {
     enable = true;
@@ -208,26 +206,4 @@ in {
       "d /data/photos/encoded-video 0755 immich immich -"
     ]
     ++ serviceHelpers.createServiceDirectories "immich" serviceConfig;
-
-  #  Fix permissions on NPU/hardware devices
-  services.udev.extraRules = ''
-    # Video devices
-    SUBSYSTEM=="video4linux", KERNEL=="video[0-9]*", GROUP="video", MODE="0664"
-
-    # RGA (2D graphics accelerator)
-    SUBSYSTEM=="misc", KERNEL=="rga", GROUP="video", MODE="0664"
-
-    # DRI/DRM devices
-    SUBSYSTEM=="drm", KERNEL=="renderD*", GROUP="render", MODE="0664"
-    SUBSYSTEM=="drm", KERNEL=="card*", GROUP="video", MODE="0664"
-
-    # MPP service
-    SUBSYSTEM=="misc", KERNEL=="mpp_service", GROUP="video", MODE="0664"
-
-    # DMA heap
-    SUBSYSTEM=="dma_heap", KERNEL=="*", GROUP="video", MODE="0664"
-
-    # NPU device
-    SUBSYSTEM=="misc", KERNEL=="rknpu", GROUP="video", MODE="0664"
-  '';
 }

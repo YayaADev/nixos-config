@@ -34,6 +34,4 @@ in {
       "--unsetenv=KOSHELF_STATISTICS_DB"
     ];
   };
-
-  networking.firewall.allowedTCPPorts = [cfg.port];
 }
